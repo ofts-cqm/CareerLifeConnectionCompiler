@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using CLCC.codeblock;
+using System.Text;
+using System.Xml.XPath;
 
 namespace CLCC.tokens
 {
@@ -15,6 +17,7 @@ namespace CLCC.tokens
 
         public static IToken[] registeredTokens = new IToken[]
         {
+            new FunctionBlock(""),
             new AssignOperatorToken(),
             new BinaryOperatorToken("*", 4),
             new BinaryOperatorToken("/", 4),
@@ -28,11 +31,27 @@ namespace CLCC.tokens
             new BinaryOperatorToken("|", 1),
             new BinaryOperatorToken("^", 1),
             new ParenthesisToken(),
+            new CodeBlock(),
             new EndOfFileToken(), 
             new NumberToken(),
             new NewVariableToken(),
-            new LocalVariableToken()
+            new LocalVariableToken(),
+            new EndOfStatementToken()
         };
+
+        public static string matchName(ref string str)
+        {
+            string name = "";
+            while(
+                (str[0] >= 'a' && str[0] <= 'z') || 
+                (str[0] >= 'A' && str[0] <= 'Z') ||
+                (str[0] >= '0' && str[0] <= '9'))
+            {
+                name += str[0];
+                str = str[1..];
+            }
+            return name;
+        }
 
         public static IToken match(ref string str, List<IToken> allTokens, bool add = true)
         {

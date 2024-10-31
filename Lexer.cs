@@ -1,4 +1,5 @@
 ﻿using CLCC;
+using CLCC.codeblock;
 using CLCC.tokens;
 using System.Text;
 
@@ -6,8 +7,10 @@ namespace clcc
 {
     class Lexer
     {
-        public static Dictionary<string, LocalVariableToken> LocalVariables = new();
+        //public static Dictionary<string, LocalVariableToken> LocalVariables { get; set; } = new();
         public static List<IToken> tokens = new();
+        public static Stack<IBlockToken> Context = new();
+        public static IBlockToken? Current => Context.Count > 0 ? Context.Peek() : null;
 
         public static void Lex(string fileContent)
         {
@@ -23,20 +26,40 @@ namespace clcc
             {
                 token1.print("");
             }
+
+            Console.WriteLine("Lexing Finished");
         }
 
         public static void Main(string[] args)
         {
-            string fileContent;
+            
 
             if (args.Length == 0)
             {
                 while (true)
                 {
-                    Console.Write(">");
-                    fileContent = Console.ReadLine() ?? "";
-                    if (fileContent == ".quit") return;
-                    if (fileContent == ".compile")
+                    string fileContent = "";
+                    while (true)
+                    {
+                        Console.Write(">");
+                        string readValue = Console.ReadLine() ?? "";
+
+                        fileContent += readValue + "\n";
+                        if (readValue.StartsWith('.'))
+                        {
+                            break;
+                        }
+                    }
+                    
+                    if (fileContent == ".quit\n") return;
+
+                    if (fileContent == ".clear\n")
+                    {
+                        tokens.Clear();
+                        continue;
+                    }
+                    
+                    if (fileContent == ".compile\n")
                     {
                         StringBuilder builder = new();
                         Destination destination = new Destination() { Type = Destination.CLOSE};
@@ -52,6 +75,7 @@ namespace clcc
             }
             else if (args.Length == 1)
             {
+                string fileContent;
                 try
                 {
                     fileContent = File.ReadAllText(args[0]);

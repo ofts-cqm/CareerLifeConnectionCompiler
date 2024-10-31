@@ -17,19 +17,14 @@ namespace CLCC.tokens
         public bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
-            if (!str.StartsWith("var")) return false;
+            if (!str.StartsWith("var ")) return false;
 
-            str = str[3..];
+            str = str[4..];
             Tokens.fixString(ref str);
-            string name = "";
-            for (int i = 0; i < str.Length && ((str[0] >= 'a' && str[0] <= 'z') || (str[0] >= 'A' && str[0] <= 'Z')); i++)
-            {
-                name += str[i];
-                str = str[1..];
-            }
+            string name = Tokens.matchName(ref str);
 
-            Variable = new(Lexer.LocalVariables.Count, name);
-            Lexer.LocalVariables.Add(name, Variable);
+            Variable = new(Lexer.Current?.LocalValue.Count ?? 0, name);//new(Lexer.LocalVariables.Count, name);
+            Lexer.Current?.LocalValue.Add(name, Variable);//Lexer.LocalVariables.Add(name, Variable);
             result = new NewVariableToken(Variable);
             Tokens.fixString(ref str);
             if (add) allTokens.Add(Variable);

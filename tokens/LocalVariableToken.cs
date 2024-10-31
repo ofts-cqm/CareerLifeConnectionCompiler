@@ -19,21 +19,17 @@ namespace CLCC.tokens
         {
             result = null;
             if (str[0] < 'a' || str[0] > 'z') return false;
-            string name = "";
-            for (int i = 0; i < str.Length && ((str[i] >= 'a' && str[i] <= 'z') || (str[i] >= 'A' && str[i] <= 'Z')); i++)
-            {
-                name += str[i];
-                str = str[1..];
-            }
+            string name = Tokens.matchName(ref str);
             Tokens.fixString(ref str);
 
-            if (Lexer.LocalVariables.TryGetValue(name, out LocalVariableToken? token))
+            if (Lexer.Current?.tryGetLocalVariable(name, out LocalVariableToken token) ?? false)//if (Lexer.LocalVariables.TryGetValue(name, out LocalVariableToken? token))
             {
                 if (add) allTokens.Add(token);
                 result = token;
                 return true;
             }
 
+            str = name + " " + str;
             return false;
         }
 
