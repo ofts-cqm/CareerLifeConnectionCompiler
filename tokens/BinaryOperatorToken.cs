@@ -24,7 +24,7 @@ namespace CLCC.tokens
 
         public string Operator { get; set; }
         public int Precedence { get; set; }
-        public string CodeName => (Type == new DataType("float") ? "f": "") + codeName[Operator];
+        public string CodeName => (Type == DataType.FLOAT ? "f": "") + codeName[Operator];
         public IExpressionToken Left { get; set; }
         public IExpressionToken Right { get; set; }
 
@@ -64,15 +64,16 @@ namespace CLCC.tokens
             return true;
         }
 
-        public BinaryOperatorToken(string @operator, int precedence, IExpressionToken left, IExpressionToken right): base(Tokens.getAdjustedDataType(left, right))
+        public BinaryOperatorToken(string @operator, int precedence, IExpressionToken left, IExpressionToken right): base(DataType.NULL)
         {
             Operator = @operator;
             Precedence = precedence;
             Left = left;
             Right = right;
+            Type = Tokens.getAdjustedDataType(this);
         }
 
-        public BinaryOperatorToken(string @operator, int precedence): base(new(""))
+        public BinaryOperatorToken(string @operator, int precedence): base(DataType.NULL)
         {
             Operator = @operator;
             Precedence = precedence;
@@ -85,7 +86,7 @@ namespace CLCC.tokens
             Right.print(indentation + "    ");
         }
 
-        public void decodeDestination(Destination destination, StringBuilder code, out string value)
+        public static void decodeDestination(Destination destination, StringBuilder code, out string value, int pos = 3)
         {
             switch (destination.Type)
             {
@@ -96,13 +97,13 @@ namespace CLCC.tokens
                     }
                 case Destination.STACK:
                     {
-                        code.Append("|imm3|mem3|sta3");
+                        code.Append($"|imm{pos}|mem{pos}|sta{pos}");
                         value = destination.OffSet.ToString();
                         break;
                     }
                 case Destination.HEAP:
                     {
-                        code.Append("|imm3|mem3");
+                        code.Append($"|imm{pos}|mem{pos}");
                         value = destination.OffSet.ToString();
                         break;
                     }

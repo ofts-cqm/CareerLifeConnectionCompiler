@@ -13,7 +13,7 @@ namespace CLCC.tokens
             Name = name;
         }
 
-        public LocalVariableToken(): base(new("")) { }
+        public LocalVariableToken(): base(DataType.NULL) { }
 
         public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
         {

@@ -7,7 +7,7 @@ namespace CLCC.tokens
         public List<IToken> insideTokens = new();
         public bool right = false;
 
-        public ExpressionParenthesisToken() : base(new("null")) { }
+        public ExpressionParenthesisToken() : base(DataType.NULL) { }
 
         public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
         {

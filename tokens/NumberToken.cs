@@ -4,7 +4,7 @@
     {
         public int number { get; set; }
         public NumberToken(int number, DataType type):base(type) { this.number = number; }
-        public NumberToken(): base(new()) { }
+        public NumberToken(): base(DataType.NULL) { }
 
         public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
         {
@@ -12,12 +12,14 @@
 
             if (str.StartsWith("true"))
             {
-                result = createNumberToken(1, ref str, allTokens, add, new("bool"));
+                result = createNumberToken(1, ref str, allTokens, add, DataType.BOOL);
+                str = str[4..];
                 return true;
             }
             else if (str.StartsWith("false"))
             {
-                result = createNumberToken(0, ref str, allTokens, add, new("bool"));
+                result = createNumberToken(0, ref str, allTokens, add, DataType.BOOL);
+                str = str[5..];
                 return true;
             }
 
@@ -37,7 +39,7 @@
                 return parseFloat(num, ref str, allTokens, add, out result);
             }
 
-            result = createNumberToken(num, ref str, allTokens, add, new("int"));
+            result = createNumberToken(num, ref str, allTokens, add, DataType.INT);
             return true;
         }
 
@@ -49,7 +51,7 @@
                 result += (float)((str[0] - '0') * Math.Pow(10, i));
                 str = str[1..];
             }
-            token = createNumberToken(BitConverter.SingleToInt32Bits(result), ref str, allTokens, add, new("float"));
+            token = createNumberToken(BitConverter.SingleToInt32Bits(result), ref str, allTokens, add, DataType.FLOAT);
             return true;
         }
 

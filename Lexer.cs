@@ -59,6 +59,7 @@ namespace clcc
                     if (fileContent == ".clear\n")
                     {
                         tokens.Clear();
+                        Console.Clear();
                         continue;
                     }
                     
@@ -76,7 +77,7 @@ namespace clcc
 
                     if (fileContent.EndsWith(".end\n"))
                     {
-                        fileContent = fileContent[..5];
+                        fileContent = fileContent.Substring(0, fileContent.Length - 5);
                     }
                     Lex(fileContent);
                 }

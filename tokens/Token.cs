@@ -30,6 +30,7 @@ namespace CLCC.tokens
             new BinaryOperatorToken("&", 1),
             new BinaryOperatorToken("|", 1),
             new BinaryOperatorToken("^", 1),
+            new PrimitiveCastOperatorToken(),
             new ExpressionParenthesisToken(),
             new CodeBlock(),
             new EndOfFileToken(), 
@@ -72,17 +73,35 @@ namespace CLCC.tokens
             }
         }
 
-        public static DataType getAdjustedDataType(IExpressionToken left, IExpressionToken right)
+        public static DataType getAdjustedDataType(BinaryOperatorToken token)
         {
-            if (left.Type == right.Type)
+            DataType left = token.Left.Type, right = token.Right.Type;
+            if (left == right)
             {
-                return left.Type;
+                return left;
             }
 
-            if (left.Type.isPrimitive && left.Type.name == "null") return right.Type;
+            // type inference
+            if (left == DataType.NULL) return right;
+
+            // auto cast (avoid strong type)
+            if (token is not AssignOperatorToken)
+            {
+                if (left == DataType.INT && right == DataType.FLOAT)
+                {
+                    token.Left = new PrimitiveCastOperatorToken("float", token.Left);
+                    return DataType.FLOAT;
+                }
+
+                if (left == DataType.FLOAT && right == DataType.INT)
+                {
+                    token.Right = new PrimitiveCastOperatorToken("float", token.Right);
+                    return DataType.FLOAT;
+                }
+            }
 
             Console.WriteLine("Error: operands does not have the same data type");
-            return new("null");
+            return DataType.NULL;
         }
     }
 }
