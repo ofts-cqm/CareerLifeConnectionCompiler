@@ -6,7 +6,7 @@ namespace CLCC.tokens
     {
         public AssignOperatorToken() : base("=", -1) { }
 
-        public AssignOperatorToken(IValueToken variable, IToken value) : base("=", -1, variable, value) { }
+        public AssignOperatorToken(IValueToken variable, IExpressionToken value) : base("=", -1, variable, value) { }
 
         public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
         {
@@ -17,7 +17,21 @@ namespace CLCC.tokens
 
             if (allTokens.Last() is LocalVariableToken variable)
             {
-                result = new AssignOperatorToken(variable, Tokens.match(ref str, allTokens, false));
+                IExpressionToken? token = Tokens.match(ref str, allTokens, false) as IExpressionToken;
+
+                if(token is null)
+                {
+                    Console.WriteLine("Error: Expected Expression");
+                    return false;
+                }
+
+                result = new AssignOperatorToken(variable, token);
+
+                if (result is AssignOperatorToken assign && assign.Left.Type.isPrimitive && assign.Left.Type.name == "null")
+                {
+                    assign.Left.Type = assign.Right.Type;
+                }
+
                 allTokens.RemoveAt(allTokens.Count - 1);
                 if (add) allTokens.Add(result);
                 return true;

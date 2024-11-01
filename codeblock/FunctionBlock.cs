@@ -44,7 +44,7 @@ namespace CLCC.codeblock
         {
             file.Append("label ").Append(Name).Append('\n');
             file.Append("var|imm1 ").Append(LocalValue.Count + SubVariableCount).Append(" null null\n");
-            Content.writeAss(file, destination);
+            Content.writeAss(file, new Destination() { Type = Destination.CLOSE});
             file.Append("ret null null null\n");
         }
     }

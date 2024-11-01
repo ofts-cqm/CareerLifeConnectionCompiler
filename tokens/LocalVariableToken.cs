@@ -7,13 +7,13 @@ namespace CLCC.tokens
         public int Offset { get; set; }
         public string Name { get; set; }
 
-        public LocalVariableToken(int offset, string name)
+        public LocalVariableToken(int offset, string name, DataType type) : base(type)
         {
             Offset = offset;
             Name = name;
         }
 
-        public LocalVariableToken() { }
+        public LocalVariableToken(): base(new("")) { }
 
         public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
         {
@@ -35,7 +35,7 @@ namespace CLCC.tokens
 
         public override void print(string indentation)
         {
-            Console.WriteLine($"{indentation}Local Variable {Name} (offset: {Offset})");
+            Console.WriteLine($"{indentation}Local {Type} {Name} (offset: {Offset})");
         }
 
         public override KeyValuePair<string, string> getVariabele(int position)

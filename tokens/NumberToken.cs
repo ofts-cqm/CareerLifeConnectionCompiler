@@ -3,8 +3,8 @@
     internal class NumberToken : IValueToken
     {
         public int number { get; set; }
-        public NumberToken(int number) { this.number = number; }
-        public NumberToken() { }
+        public NumberToken(int number, DataType type):base(type) { this.number = number; }
+        public NumberToken(): base(new()) { }
 
         public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
         {
@@ -12,12 +12,12 @@
 
             if (str.StartsWith("true"))
             {
-                result = createNumberToken(1, ref str, allTokens, add);
+                result = createNumberToken(1, ref str, allTokens, add, new("bool"));
                 return true;
             }
             else if (str.StartsWith("false"))
             {
-                result = createNumberToken(0, ref str, allTokens, add);
+                result = createNumberToken(0, ref str, allTokens, add, new("bool"));
                 return true;
             }
 
@@ -37,7 +37,7 @@
                 return parseFloat(num, ref str, allTokens, add, out result);
             }
 
-            result = createNumberToken(num, ref str, allTokens, add);
+            result = createNumberToken(num, ref str, allTokens, add, new("int"));
             return true;
         }
 
@@ -49,13 +49,13 @@
                 result += (float)((str[0] - '0') * Math.Pow(10, i));
                 str = str[1..];
             }
-            token = createNumberToken(BitConverter.SingleToInt32Bits(result), ref str, allTokens, add);
+            token = createNumberToken(BitConverter.SingleToInt32Bits(result), ref str, allTokens, add, new("float"));
             return true;
         }
 
-        public IToken createNumberToken(int num, ref string str, List<IToken> allTokens, bool add)
+        public IToken createNumberToken(int num, ref string str, List<IToken> allTokens, bool add, DataType type)
         {
-            IToken token = new NumberToken(num);
+            IToken token = new NumberToken(num, type);
             if (add) allTokens.Add(token);
             Tokens.fixString(ref str);
             return token;
@@ -63,7 +63,7 @@
 
         public override void print(string indentation)
         {
-            Console.WriteLine(indentation + "Number Token " + number);
+            Console.WriteLine($"{indentation}Number Token {number} Type {Type}");
         }
 
         public override KeyValuePair<string, string> getVariabele(int position)

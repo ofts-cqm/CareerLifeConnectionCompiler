@@ -2,7 +2,7 @@
 
 namespace CLCC.tokens
 {
-    public class BinaryOperatorToken : IToken
+    public class BinaryOperatorToken : IExpressionToken
     {
         public static readonly Dictionary<string, string> codeName = new()
         {
@@ -24,18 +24,23 @@ namespace CLCC.tokens
 
         public string Operator { get; set; }
         public int Precedence { get; set; }
-        public string CodeName => codeName[Operator];
-        public IToken Left { get; set; }
-        public IToken Right { get; set; }
+        public string CodeName => (Type == new DataType("float") ? "f": "") + codeName[Operator];
+        public IExpressionToken Left { get; set; }
+        public IExpressionToken Right { get; set; }
 
-        public virtual bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
+        public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
             if (!str.StartsWith(Operator)) return false;
 
             str = str[Operator.Length..];
             Tokens.fixString(ref str);
-            IToken right = Tokens.match(ref str, allTokens, false);
+
+            if (Tokens.match(ref str, allTokens, false) is not IExpressionToken right)
+            {
+                Console.WriteLine("Error: Expected Expression");
+                return false;
+            }
 
             if (allTokens.Count > 0 && allTokens.Last() is BinaryOperatorToken opToken
                 && opToken.Precedence < Precedence)
@@ -45,7 +50,13 @@ namespace CLCC.tokens
             }
             else
             {
-                result = new BinaryOperatorToken(Operator, Precedence, allTokens.Last(), right);
+                if (allTokens.Last() is not IExpressionToken left)
+                {
+                    Console.WriteLine("Error: Expected Expression, found " + allTokens.Last().GetType());
+                    return false;
+                }
+
+                result = new BinaryOperatorToken(Operator, Precedence, left, right);
                 allTokens.RemoveAt(allTokens.Count - 1);
                 if (add) allTokens.Add(result);
             }
@@ -53,7 +64,7 @@ namespace CLCC.tokens
             return true;
         }
 
-        public BinaryOperatorToken(string @operator, int precedence, IToken left, IToken right)
+        public BinaryOperatorToken(string @operator, int precedence, IExpressionToken left, IExpressionToken right): base(Tokens.getAdjustedDataType(left, right))
         {
             Operator = @operator;
             Precedence = precedence;
@@ -61,15 +72,15 @@ namespace CLCC.tokens
             Right = right;
         }
 
-        public BinaryOperatorToken(string @operator, int precedence)
+        public BinaryOperatorToken(string @operator, int precedence): base(new(""))
         {
             Operator = @operator;
             Precedence = precedence;
         }
 
-        public void print(string indentation)
+        public override void print(string indentation)
         {
-            Console.WriteLine(indentation + "Binary Operator " + Operator);
+            Console.WriteLine($"{indentation}Binary Operator {Operator} Evaluating {Type}");
             Left.print(indentation + "    ");
             Right.print(indentation + "    ");
         }
@@ -103,12 +114,12 @@ namespace CLCC.tokens
             }
         }
 
-        public virtual void writeAss(StringBuilder file, Destination destination)
+        public override void writeAss(StringBuilder file, Destination destination)
         {
             StringBuilder code = new StringBuilder().Append(CodeName);
-            string leftValue = "", rightValue = "", endValue = "";
             bool shoudPop = false, usedRegister = false;
 
+            string leftValue;
             {
                 if (Left is IValueToken value)
                 {
@@ -116,11 +127,11 @@ namespace CLCC.tokens
                     code.Append(pair.Key);
                     leftValue = pair.Value;
                 }
-                else if (Left is BinaryOperatorToken || Left is ParenthesisToken)
+                else
                 {
                     if (Tokens.registerUsed < 4)
                     {
-                        Left.writeAss(file, new Destination() 
+                        Left.writeAss(file, new Destination()
                         { Type = Destination.REGISTER, OffSet = Tokens.registerUsed });
                         leftValue = Destination.RegisterName[Tokens.registerUsed++];
                         usedRegister = true;
@@ -132,10 +143,11 @@ namespace CLCC.tokens
                         file.Append("push edi null null\n");
                         leftValue = "edi";
                     }
-                    
+
                 }
             }
 
+            string rightValue;
             {
                 if (Right is IValueToken value)
                 {
@@ -143,7 +155,7 @@ namespace CLCC.tokens
                     code.Append(pair.Key);
                     rightValue = pair.Value;
                 }
-                else if (Right is BinaryOperatorToken || Right is ParenthesisToken)
+                else
                 {
                     Right.writeAss(file, SecondDestination);
                     rightValue = "esi";
@@ -160,7 +172,7 @@ namespace CLCC.tokens
                 file.Append("pop null null edi");
             }
 
-            decodeDestination(destination, code, out endValue);
+            decodeDestination(destination, code, out string endValue);
             
             file.Append(code).Append(' ')
                 .Append(leftValue).Append(' ')

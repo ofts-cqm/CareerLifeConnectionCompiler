@@ -2,15 +2,13 @@
 
 namespace CLCC.tokens
 {
-    public abstract class IValueToken: IToken
+    public abstract class IValueToken: IExpressionToken
     {
+        public IValueToken(DataType type) : base(type) { }
+
         public abstract KeyValuePair<string, string> getVariabele(int position);
 
-        public abstract bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true);
-
-        public abstract void print(string indentation);
-
-        public void writeAss(StringBuilder file, Destination destination) { }
+        public override void writeAss(StringBuilder file, Destination destination) { }
 
         public abstract Destination GetDestination();
     }

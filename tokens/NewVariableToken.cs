@@ -23,7 +23,7 @@ namespace CLCC.tokens
             Tokens.fixString(ref str);
             string name = Tokens.matchName(ref str);
 
-            Variable = new(Lexer.Current?.LocalValue.Count ?? 0, name);//new(Lexer.LocalVariables.Count, name);
+            Variable = new(Lexer.Current?.LocalValue.Count ?? 0, name, new("null"));//new(Lexer.LocalVariables.Count, name);
             Lexer.Current?.LocalValue.Add(name, Variable);//Lexer.LocalVariables.Add(name, Variable);
             result = new NewVariableToken(Variable);
             Tokens.fixString(ref str);

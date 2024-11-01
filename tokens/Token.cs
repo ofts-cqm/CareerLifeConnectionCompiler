@@ -30,13 +30,12 @@ namespace CLCC.tokens
             new BinaryOperatorToken("&", 1),
             new BinaryOperatorToken("|", 1),
             new BinaryOperatorToken("^", 1),
-            new ParenthesisToken(),
+            new ExpressionParenthesisToken(),
             new CodeBlock(),
             new EndOfFileToken(), 
             new NumberToken(),
             new NewVariableToken(),
-            new LocalVariableToken(),
-            new EndOfStatementToken()
+            new LocalVariableToken()
         };
 
         public static string matchName(ref string str)
@@ -71,6 +70,19 @@ namespace CLCC.tokens
             {
                 str = str.Remove(0, 1);
             }
+        }
+
+        public static DataType getAdjustedDataType(IExpressionToken left, IExpressionToken right)
+        {
+            if (left.Type == right.Type)
+            {
+                return left.Type;
+            }
+
+            if (left.Type.isPrimitive && left.Type.name == "null") return right.Type;
+
+            Console.WriteLine("Error: operands does not have the same data type");
+            return new("null");
         }
     }
 }

@@ -10,7 +10,10 @@ namespace clcc
         //public static Dictionary<string, LocalVariableToken> LocalVariables { get; set; } = new();
         public static List<IToken> tokens = new();
         public static Stack<IBlockToken> Context = new();
+        public static Dictionary<string, GlobalVariableToken> GlobalVariables = new();
         public static IBlockToken? Current => Context.Count > 0 ? Context.Peek() : null;
+
+        public static bool GetVariable(string name, out GlobalVariableToken variableToken) => GlobalVariables.TryGetValue(name, out variableToken); 
 
         public static void Lex(string fileContent)
         {
@@ -69,6 +72,11 @@ namespace clcc
                         }
                         Console.WriteLine(builder);
                         continue;
+                    }
+
+                    if (fileContent.EndsWith(".end\n"))
+                    {
+                        fileContent = fileContent[..5];
                     }
                     Lex(fileContent);
                 }
