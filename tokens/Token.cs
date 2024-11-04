@@ -30,7 +30,8 @@ namespace CLCC.tokens
             new BinaryOperatorToken("&", 1),
             new BinaryOperatorToken("|", 1),
             new BinaryOperatorToken("^", 1),
-            new PrimitiveCastOperatorToken(),
+            new FloatIntCastOperatorToken(),
+            new NoEffectVariableCastToken(),
             new ExpressionParenthesisToken(),
             new CodeBlock(),
             new EndOfFileToken(), 
@@ -89,15 +90,15 @@ namespace CLCC.tokens
             {
                 if (left == DataType.INT && right == DataType.FLOAT)
                 {
-                    token.Left = new PrimitiveCastOperatorToken("float", token.Left);
+                    token.Left = new FloatIntCastOperatorToken("float", token.Left);
                     return DataType.FLOAT;
                 }
+            }
 
-                if (left == DataType.FLOAT && right == DataType.INT)
-                {
-                    token.Right = new PrimitiveCastOperatorToken("float", token.Right);
-                    return DataType.FLOAT;
-                }
+            if (left == DataType.FLOAT && right == DataType.INT)
+            {
+                token.Right = new FloatIntCastOperatorToken("float", token.Right);
+                return DataType.FLOAT;
             }
 
             Console.WriteLine("Error: operands does not have the same data type");

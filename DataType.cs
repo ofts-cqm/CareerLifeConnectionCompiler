@@ -44,15 +44,7 @@ namespace CLCC
 
         public static bool TryParseDataType(ref string str, out DataType parsedDatatype)
         {
-            if (str.StartsWith("var "))
-            {
-                str = str[4..];
-                Tokens.fixString(ref str);
-                parsedDatatype = NULL;
-                return true;
-            }
-
-            else if (str.StartsWith("void "))
+            if (str.StartsWith("void "))
             {
                 str = str[5..];
                 Tokens.fixString(ref str);
@@ -62,7 +54,7 @@ namespace CLCC
 
             foreach (DataType type in RegisteredDataType)
             {
-                if (str.StartsWith(type.name + " "))
+                if (str.StartsWith(type.name + ' ') || str.StartsWith(type.name + ')'))
                 {
                     str = str[(type.name.Length + 1)..];
                     Tokens.fixString(ref str);

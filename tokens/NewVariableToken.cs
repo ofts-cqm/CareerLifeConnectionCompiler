@@ -17,6 +17,9 @@ namespace CLCC.tokens
         public bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
+            if (!str.StartsWith("var ")) return false;
+            str = str[4..];
+            Tokens.fixString(ref str);
             if (!DataType.TryParseDataType(ref str, out DataType type)) return false;
             string name = Tokens.matchName(ref str);
 

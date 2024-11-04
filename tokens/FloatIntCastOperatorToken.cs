@@ -2,13 +2,13 @@
 
 namespace CLCC.tokens
 {
-    public class PrimitiveCastOperatorToken : IExpressionToken
+    public class FloatIntCastOperatorToken : IExpressionToken
     {
         public IExpressionToken Right { get; set; }
 
-        public PrimitiveCastOperatorToken() : base(DataType.NULL) { }
+        public FloatIntCastOperatorToken() : base(DataType.NULL) { }
 
-        public PrimitiveCastOperatorToken(string target, IExpressionToken right):base(new(target))
+        public FloatIntCastOperatorToken(string target, IExpressionToken right):base(new(target))
         {
             Right = right;
         }
@@ -25,7 +25,7 @@ namespace CLCC.tokens
                 Tokens.fixString(ref str);
                 type = "int";
             }
-            else if (str[1..7] == "float)")
+            else if (str.Length > 7 && str[1..7] == "float)")
             {
                 str = str[7..];
                 Tokens.fixString(ref str);
@@ -40,7 +40,7 @@ namespace CLCC.tokens
                 return false;
             }
 
-            result = new PrimitiveCastOperatorToken(type, right);
+            result = new FloatIntCastOperatorToken(type, right);
             if (add) allTokens.Add(result);
             return true;
         }

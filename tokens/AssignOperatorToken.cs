@@ -27,7 +27,7 @@ namespace CLCC.tokens
 
                 result = new AssignOperatorToken(variable, token);
 
-                if (result is AssignOperatorToken assign && assign.Left.Type.isPrimitive && assign.Left.Type.name == "null")
+                if (result is AssignOperatorToken assign && assign.Left.Type == DataType.NULL)
                 {
                     assign.Left.Type = assign.Right.Type;
                 }
