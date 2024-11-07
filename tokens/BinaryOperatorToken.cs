@@ -28,17 +28,14 @@ namespace CLCC.tokens
         public IExpressionToken Left { get; set; }
         public IExpressionToken Right { get; set; }
 
-        public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
+        public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
-            if (!str.StartsWith(Operator)) return false;
+            if (!Content.Match(Operator)) return false;
 
-            str = str[Operator.Length..];
-            Tokens.fixString(ref str);
-
-            if (Tokens.match(ref str, allTokens, false) is not IExpressionToken right)
+            if (Tokens.match(allTokens, false) is not IExpressionToken right)
             {
-                Console.WriteLine("Error: Expected Expression");
+                Content.LogError("Expected Expression");
                 return false;
             }
 
@@ -52,7 +49,7 @@ namespace CLCC.tokens
             {
                 if (allTokens.Last() is not IExpressionToken left)
                 {
-                    Console.WriteLine("Error: Expected Expression, found " + allTokens.Last().GetType());
+                    Content.LogError("Expected Expression, found " + allTokens.Last().GetType());
                     return false;
                 }
 

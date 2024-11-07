@@ -13,30 +13,31 @@ namespace CLCC.tokens
             Right = right;
         }
 
-        public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
+        public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
-            if (str.Length < 5 || str[0] != '(') return false;
+            Content.Push();
+            if (!Content.Match("("))
+            {
+                Content.Pop();
+                return false;
+            }
 
             string type = "";
-            if (str[1..5] == "int)")
-            {
-                str = str[5..];
-                Tokens.fixString(ref str);
-                type = "int";
-            }
-            else if (str.Length > 7 && str[1..7] == "float)")
-            {
-                str = str[7..];
-                Tokens.fixString(ref str);
-                type = "float";
-            }
+            if (Content.Match("int)")) type = "int";
+            else if (Content.Match("float)")) type = "float";
 
-            if (type == "") return false;
-
-            if (Tokens.match(ref str, allTokens, false) is not IExpressionToken right)
+            if (type == "")
             {
-                Console.WriteLine("Error: Expected Expression");
+                Content.Pop();
+                return false;
+            }
+            else Content.Ignore();
+
+            if (Tokens.match(allTokens, false) is not IExpressionToken right)
+            {
+                Content.LogError("Expected Expression");
+                Content.Pop();
                 return false;
             }
 

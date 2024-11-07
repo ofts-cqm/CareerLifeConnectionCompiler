@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using clcc;
+using CLCC.tokens;
+using System.Text;
 
 namespace CLCC
 {
@@ -7,14 +9,44 @@ namespace CLCC
         private static string[] fileContent = Array.Empty<string>();
         private static int currentLine = 0;
         private static int currentPosition = 0;
+        private static Stack<KeyValuePair<int, int>> stack = new();
 
-        public static string Current => fileContent[currentLine];
+        public static string Current => currentLine < fileContent.Length ? fileContent[currentLine] : "";
+        public static char CurrentChar => currentPosition < Current.Length ? Current[currentPosition] : (char)0;
 
         public static void Init()
         {
             fileContent = Array.Empty<string>();
             currentLine = 0;
             currentPosition = 0;
+            stack.Clear();
+        }
+
+        public static void Advance()
+        {
+            currentPosition++;
+            if (currentPosition == Current.Length)
+            {
+                currentPosition = 0;
+                currentLine++;
+            }
+        }
+
+        public static void Push()
+        {
+            stack.Push(new KeyValuePair<int, int>(currentLine, currentPosition));
+        }
+
+        public static void Pop()
+        {
+            KeyValuePair<int, int> pair = stack.Pop();
+            currentLine = pair.Key;
+            currentPosition = pair.Value;
+        }
+
+        public static void Ignore()
+        {
+            stack.Pop();
         }
 
         public static void Analyze(string path)
@@ -31,7 +63,7 @@ namespace CLCC
                 return;
             }
 
-            for (int i = 0; i < fileContent.Length; i++)
+            while (!IsEnd())
             {
                 Fix();
                 currentLine++;
@@ -39,16 +71,66 @@ namespace CLCC
             currentLine = 0;
         }
 
-        public static void Fix()
+        public static bool Analyze()
         {
-            throw new NotImplementedException();
+            List<string> read = new();
+            bool compile = false;
+            while (true)
+            {
+                Console.Write(">");
+                string readValue = Console.ReadLine() ?? "";
+
+                if (!readValue.StartsWith('.'))
+                {
+                    read.Add(readValue);
+                    continue;
+                }
+                
+                if (readValue.StartsWith(".end"))
+                {
+                    break;
+                }
+                else if(readValue == ".clear")
+                {
+                    Lexer.tokens.Clear();
+                    Console.Clear();
+                    read.Clear();
+                    continue;
+                }
+                else if (readValue == ".compile")
+                {
+                    compile = true;
+                    break;
+                }
+            }
+
+            fileContent = read.ToArray();
+            while (currentLine < fileContent.Length)
+            {
+                Fix();
+                currentLine++;
+            }
+            currentLine = 0;
+            return compile;
         }
 
-        public static bool IsEnd() => currentLine == fileContent.Length;
+        public static void Fix()
+        {
+            string a= Current;
+            while (currentLine < fileContent.Length && (CurrentChar == ' ' || CurrentChar == '\n' || CurrentChar == '\r' || CurrentChar == '\t'))
+            {
+                Advance();
+
+            }
+            string b = Current;
+        }
+
+        public static bool IsEnd() => currentLine >= fileContent.Length;
 
         public static bool Match(string content)
         {
-            if (Get(content.Length) == content)
+            string get = Get(content.Length);
+            if (get == content)
             {
                 Cut(content.Length);
                 return true;
@@ -84,30 +166,33 @@ namespace CLCC
 
         public static string Get(int length)
         {
-            if (length <= Current.Length) return Current.Substring(currentPosition, length);
+            if (length + currentPosition <= Current.Length) 
+                return Current.Substring(currentPosition, length);
 
             StringBuilder builder = new(Current[currentPosition..]);
-            int oldPosition = currentPosition, oldLine = currentLine;
-            while (length >= Current.Length)
+            Push();
+            while (length + currentPosition >= Current.Length)
             {
                 builder.Append(Current).Append(' ');
-                length -= Current.Length;
+                length -= (Current.Length - currentPosition);
                 currentLine++;
+                currentPosition = 0;
+                if (currentLine >= fileContent.Length)
+                {
+                    Pop();
+                    return "";
+                }
             }
             builder.Append(Current.AsSpan(currentPosition, length));
-            currentPosition = oldPosition;
-            currentLine = oldLine;
+            Pop();
             return builder.ToString();
         }
 
         public static void Cut(int length)
         {
-            currentPosition += length;
-            while (currentPosition >= Current.Length)
-            {
-                currentPosition -= Current.Length;
-                currentLine++;
-            }
+            while (length-- > 0) 
+                Advance();
+            Fix();
         }
     }
 }

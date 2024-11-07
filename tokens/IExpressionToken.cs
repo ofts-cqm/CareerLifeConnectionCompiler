@@ -11,7 +11,7 @@ namespace CLCC.tokens
 
         public DataType Type { get; set; }
 
-        public abstract bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true);
+        public abstract bool match(List<IToken> allTokens, out IToken? result, bool add = true);
 
         public abstract void print(string indentation);
 

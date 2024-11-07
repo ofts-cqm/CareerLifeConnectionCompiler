@@ -9,31 +9,29 @@ namespace CLCC.tokens
 
         public ExpressionParenthesisToken() : base(DataType.NULL) { }
 
-        public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
+        public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
-            if (str.StartsWith('('))
+            if (Content.Match("("))
             {
-                str = str[1..];
-                Tokens.fixString(ref str);
                 ExpressionParenthesisToken result1 = new ExpressionParenthesisToken();
-                IToken? matched = Tokens.match(ref str, result1.insideTokens);
+                IToken? matched = Tokens.match(result1.insideTokens);
 
                 while (!(matched is ExpressionParenthesisToken parenthesis && parenthesis.right))
                 {
                     //insideTokens.Add(matched);
-                    matched = Tokens.match(ref str, result1.insideTokens);
+                    matched = Tokens.match(result1.insideTokens);
                 }
 
                 if (result1.insideTokens.Count > 1)
                 {
-                    Console.WriteLine("Error: ExpressionParenthesisToken is expected to contain only one token");
+                    Content.LogError("ExpressionParenthesisToken is expected to contain only one token");
                     result = null;
                     return false;
                 }
 
                 if (result1.insideTokens[0] is not IExpressionToken expression)
                 {
-                    Console.WriteLine("Error: ExpressionParenthesisToken is expected to contain an expression");
+                    Content.LogError("ExpressionParenthesisToken is expected to contain an expression");
                     result = null;
                     return false;
                 }
@@ -43,10 +41,8 @@ namespace CLCC.tokens
                 if (add) allTokens.Add(result);
                 return true;
             }
-            else if (str.StartsWith(')'))
+            else if (Content.Match(")"))
             {
-                str = str[1..];
-                Tokens.fixString(ref str);
                 result = new ExpressionParenthesisToken() { right = true };
                 return true;
             }

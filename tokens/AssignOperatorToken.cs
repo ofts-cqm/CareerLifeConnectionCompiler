@@ -8,20 +8,18 @@ namespace CLCC.tokens
 
         public AssignOperatorToken(IValueToken variable, IExpressionToken value) : base("=", -1, variable, value) { }
 
-        public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
+        public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
-            if (!str.StartsWith('=')) return false;
-            str = str[1..];
-            Tokens.fixString(ref str);
+            if (!Content.Match("=")) return false;
 
             if (allTokens.Last() is LocalVariableToken variable)
             {
-                IExpressionToken? token = Tokens.match(ref str, allTokens, false) as IExpressionToken;
+                IExpressionToken? token = Tokens.match(allTokens, false) as IExpressionToken;
 
                 if(token is null)
                 {
-                    Console.WriteLine("Error: Expected Expression");
+                    Content.LogError("Expected Expression");
                     return false;
                 }
 
@@ -36,7 +34,7 @@ namespace CLCC.tokens
                 if (add) allTokens.Add(result);
                 return true;
             }
-            Console.WriteLine("Error: Expected A Variable before = sign");
+            Content.LogError("Expected A Variable before = sign");
             return false;
         }
 

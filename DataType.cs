@@ -42,22 +42,18 @@ namespace CLCC
             return name.GetHashCode() + (isPrimitive?1:0);
         }
 
-        public static bool TryParseDataType(ref string str, out DataType parsedDatatype)
+        public static bool TryParseDataType(out DataType parsedDatatype)
         {
-            if (str.StartsWith("void "))
+            if (Content.Match("void "))
             {
-                str = str[5..];
-                Tokens.fixString(ref str);
                 parsedDatatype = NULL;
                 return true;
             }
 
             foreach (DataType type in RegisteredDataType)
             {
-                if (str.StartsWith(type.name + ' ') || str.StartsWith(type.name + ')'))
+                if (Content.Match(type.name + ' ') || Content.Match(type.name + ')'))
                 {
-                    str = str[(type.name.Length + 1)..];
-                    Tokens.fixString(ref str);
                     parsedDatatype = type;
                     return true;
                 }

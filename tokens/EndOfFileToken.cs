@@ -4,15 +4,10 @@ namespace CLCC.tokens
 {
     public class EndOfFileToken : IToken
     {
-        public bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
+        public bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = this;
-            if (str == null || str.Length == 0)
-            {
-                str = "";
-                return true;
-            }
-            return false;
+            return Content.IsEnd();
         }
 
         public void print(string indentation)

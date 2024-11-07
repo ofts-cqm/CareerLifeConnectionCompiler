@@ -6,7 +6,7 @@ namespace CLCC.tokens
 {
     public interface IToken
     {
-        bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true);
+        bool match(List<IToken> allTokens, out IToken? result, bool add = true);
         void print(string indentation);
         void writeAss(StringBuilder file, Destination destination);
     }
@@ -17,6 +17,7 @@ namespace CLCC.tokens
 
         public static IToken[] registeredTokens = new IToken[]
         {
+            new EndOfFileToken(),
             new FunctionBlock(""),
             new AssignOperatorToken(),
             new BinaryOperatorToken("*", 4),
@@ -34,38 +35,42 @@ namespace CLCC.tokens
             new NoEffectVariableCastToken(),
             new ExpressionParenthesisToken(),
             new CodeBlock(),
-            new EndOfFileToken(), 
             new NumberToken(),
             new NewVariableToken(),
             new LocalVariableToken()
         };
 
-        public static string matchName(ref string str)
+        public static string matchName()
         {
             string name = "";
             while(
-                (str[0] >= 'a' && str[0] <= 'z') || 
-                (str[0] >= 'A' && str[0] <= 'Z') ||
-                (str[0] >= '0' && str[0] <= '9'))
+                (Content.CurrentChar >= 'a' && Content.CurrentChar <= 'z') || 
+                (Content.CurrentChar >= 'A' && Content.CurrentChar <= 'Z') ||
+                (Content.CurrentChar >= '0' && Content.CurrentChar <= '9'))
             {
-                name += str[0];
-                str = str[1..];
+                name += Content.CurrentChar;
+                Content.Advance();
             }
+            Content.Fix();
             return name;
         }
 
-        public static IToken match(ref string str, List<IToken> allTokens, bool add = true)
+        public static IToken match(List<IToken> allTokens, bool add = true)
         {
             foreach (IToken token in registeredTokens)
             {
-                if (token.match(ref str, allTokens, out IToken? result, add) && result is not null) 
-                    return result;
+                if (token.match(allTokens, out IToken? result, add))
+                {
+                    if (result is not null) return result;
+                    Content.LogWarn("Read null token");
+                }   
             }
 
-            Console.WriteLine($"failed to read token at {(str.Length < 10 ? str : str[..10])}");
+            Content.LogError("Failed to read token");
             return new EndOfFileToken();
         }
 
+        [Obsolete]
         public static void fixString(ref string str)
         {
             while (str.Length != 0 && (str[0] == ' ' || str[0] == '\n' || str[0] == '\r' || str[0] == '\t'))

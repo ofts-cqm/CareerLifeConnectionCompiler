@@ -8,28 +8,24 @@ namespace CLCC.codeblock
         public bool right = false;
         public List<IToken> insideTokens = new();
 
-        public bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
+        public bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
-            if (str.StartsWith('{'))
+            if (Content.Match("{"))
             {
-                str = str[1..];
-                Tokens.fixString(ref str);
                 result = new CodeBlock();
-                IToken? matched = Tokens.match(ref str, ((CodeBlock)result).insideTokens);
+                IToken? matched = Tokens.match(((CodeBlock)result).insideTokens);
 
                 while (!(matched is CodeBlock parenthesis && parenthesis.right))
                 {
                     //insideTokens.Add(matched);
-                    matched = Tokens.match(ref str, ((CodeBlock)result).insideTokens);
+                    matched = Tokens.match(((CodeBlock)result).insideTokens);
                 }
 
                 if (add) allTokens.Add(result);
                 return true;
             }
-            else if (str.StartsWith('}'))
+            else if (Content.Match("}"))
             {
-                str = str[1..];
-                Tokens.fixString(ref str);
                 result = new CodeBlock() { right = true };
                 return true;
             }

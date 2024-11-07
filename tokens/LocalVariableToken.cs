@@ -15,21 +15,22 @@ namespace CLCC.tokens
 
         public LocalVariableToken(): base(DataType.NULL) { }
 
-        public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
+        public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
-            if (str[0] < 'a' || str[0] > 'z') return false;
-            string name = Tokens.matchName(ref str);
-            Tokens.fixString(ref str);
+            if (Content.CurrentChar < 'a' || Content.CurrentChar > 'z') return false;
+            Content.Push();
+            string name = Tokens.matchName();
 
             if (Lexer.Current?.tryGetLocalVariable(name, out LocalVariableToken token) ?? false)//if (Lexer.LocalVariables.TryGetValue(name, out LocalVariableToken? token))
             {
                 if (add) allTokens.Add(token);
                 result = token;
+                Content.Ignore();
                 return true;
             }
 
-            str = name + " " + str;
+            Content.Pop();
             return false;
         }
 

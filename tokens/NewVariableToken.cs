@@ -14,19 +14,15 @@ namespace CLCC.tokens
 
         public NewVariableToken() { }
 
-        public bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
+        public bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
-            if (!str.StartsWith("var ")) return false;
-            str = str[4..];
-            Tokens.fixString(ref str);
-            if (!DataType.TryParseDataType(ref str, out DataType type)) return false;
-            string name = Tokens.matchName(ref str);
+            if (!DataType.TryParseDataType(out DataType type)) return false;
+            string name = Tokens.matchName();
 
             Variable = new(Lexer.Current?.LocalValue.Count ?? 0, name, type);//new(Lexer.LocalVariables.Count, name);
             Lexer.Current?.LocalValue.Add(name, Variable);//Lexer.LocalVariables.Add(name, Variable);
             result = new NewVariableToken(Variable);
-            Tokens.fixString(ref str);
             if (add) allTokens.Add(Variable);
             return true;
         }

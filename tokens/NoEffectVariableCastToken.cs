@@ -15,23 +15,27 @@
 
         public override KeyValuePair<string, string> getVariabele(int position) => baseToken.getVariabele(position);
 
-        public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
+        public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
-            if (!str.StartsWith('(')) return false;
-            str = str[1..];
-            Tokens.fixString(ref str);
-            if (!DataType.TryParseDataType(ref str, out DataType castedType))
+            Content.Push();
+            if (!Content.Match("("))
             {
-                str = '(' + str;
+                Content.Pop();
+                return false;
+            }
+            if (!DataType.TryParseDataType(out DataType castedType))
+            {
+                Content.Pop();
                 return false;
             }
 
-            IToken matched = Tokens.match(ref str, allTokens, false);
+            IToken matched = Tokens.match(allTokens, false);
             if (matched is IValueToken value)
             {
                 result = new NoEffectVariableCastToken(castedType, value);
                 if (add) allTokens.Add(result);
+                Content.Ignore();
                 return true;
             }
             else if(matched is IExpressionToken expression)
@@ -39,8 +43,11 @@
                 result = matched;
                 expression.Type = castedType;
                 if (add) allTokens.Add(result);
+                Content.Ignore();
                 return true;
             }
+
+            Content.Pop() ;
             return false;
         }
 

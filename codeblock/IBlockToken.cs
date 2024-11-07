@@ -29,7 +29,7 @@ namespace CLCC.codeblock
             Content = new CodeBlock();
         }
 
-        public abstract bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true);
+        public abstract bool match(List<IToken> allTokens, out IToken? result, bool add = true);
 
         public void print(string indentation)
         {

@@ -6,60 +6,59 @@
         public NumberToken(int number, DataType type):base(type) { this.number = number; }
         public NumberToken(): base(DataType.NULL) { }
 
-        public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
+        public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
 
-            if (str.StartsWith("true"))
+            if (Content.Match("true"))
             {
-                result = createNumberToken(1, ref str, allTokens, add, DataType.BOOL);
-                str = str[4..];
+                result = createNumberToken(1, allTokens, add, DataType.BOOL);
                 return true;
             }
-            else if (str.StartsWith("false"))
+            else if (Content.Match("false"))
             {
-                result = createNumberToken(0, ref str, allTokens, add, DataType.BOOL);
-                str = str[5..];
+                result = createNumberToken(0, allTokens, add, DataType.BOOL);
                 return true;
             }
 
-            if (str[0] < '0' || str[0] > '9') return false;
+            if (Content.CurrentChar < '0' || Content.CurrentChar > '9') return false;
 
             int num = 0;
-            while (str.Length > 0 && str[0] >= '0' && str[0] <= '9')
+            while (!Content.IsEnd() && Content.CurrentChar >= '0' && Content.CurrentChar <= '9')
             {
                 num *= 10;
-                num += str[0] - '0';
-                str = str[1..];
+                num += Content.CurrentChar - '0';
+                Content.Advance();
             }
 
-            if (str.StartsWith('.'))
+            if (Content.Match("."))
             {
-                str = str[1..];
-                return parseFloat(num, ref str, allTokens, add, out result);
+                Content.Advance();
+                return parseFloat(num, allTokens, add, out result);
             }
 
-            result = createNumberToken(num, ref str, allTokens, add, DataType.INT);
+            Content.Fix();
+            result = createNumberToken(num, allTokens, add, DataType.INT);
             return true;
         }
 
-        public bool parseFloat(int num, ref string str, List<IToken> allTokens, bool add, out IToken token)
+        public bool parseFloat(int num, List<IToken> allTokens, bool add, out IToken token)
         {
             float result = num;
-            for (int i = -1; str.Length > 0 && str[0] >= '0' && str[0] <= '9'; i--)
+            for (int i = -1; !Content.IsEnd() && Content.CurrentChar >= '0' && Content.CurrentChar <= '9'; i--)
             {
-                result += (float)((str[0] - '0') * Math.Pow(10, i));
-                str = str[1..];
+                result += (float)((Content.CurrentChar - '0') * Math.Pow(10, i));
+                Content.Advance();
             }
-            token = createNumberToken(BitConverter.SingleToInt32Bits(result), ref str, allTokens, add, DataType.FLOAT);
+            Content.Fix();
+            token = createNumberToken(BitConverter.SingleToInt32Bits(result), allTokens, add, DataType.FLOAT);
             return true;
         }
 
-        public IToken createNumberToken(int num, ref string str, List<IToken> allTokens, bool add, DataType type)
+        public IToken createNumberToken(int num, List<IToken> allTokens, bool add, DataType type)
         {
             IToken token = new NumberToken(num, type);
             if (add) allTokens.Add(token);
-            Tokens.fixString(ref str);
             return token;
         }
 

@@ -15,17 +15,17 @@ namespace clcc
 
         public static bool GetVariable(string name, out GlobalVariableToken variableToken) => GlobalVariables.TryGetValue(name, out variableToken); 
 
-        public static void Lex(string fileContent)
+        public static void Lex(bool print)
         {
             IToken? token;
 
             do
             {
-                token = Tokens.match(ref fileContent, tokens);
+                token = Tokens.match(tokens);
             }
             while (token is not EndOfFileToken);
 
-            foreach (IToken token1 in tokens)
+            if (print) foreach (IToken token1 in tokens)
             {
                 token1.print("");
             }
@@ -35,68 +35,27 @@ namespace clcc
 
         public static void Main(string[] args)
         {
-            
-
             if (args.Length == 0)
             {
                 while (true)
                 {
-                    string fileContent = "";
-                    while (true)
+                    bool compile = Content.Analyze();
+                    Lex(!compile);
+                    if (compile)
                     {
-                        Console.Write(">");
-                        string readValue = Console.ReadLine() ?? "";
-
-                        fileContent += readValue + "\n";
-                        if (readValue.StartsWith('.'))
+                        StringBuilder sb = new StringBuilder();
+                        foreach (IToken token in tokens)
                         {
-                            break;
+                            token.writeAss(sb, new() { Type = Destination.CLOSE });
                         }
+                        Console.WriteLine(sb.ToString());
                     }
-                    
-                    if (fileContent == ".quit\n") return;
-
-                    if (fileContent == ".clear\n")
-                    {
-                        tokens.Clear();
-                        Console.Clear();
-                        continue;
-                    }
-                    
-                    if (fileContent == ".compile\n")
-                    {
-                        StringBuilder builder = new();
-                        Destination destination = new Destination() { Type = Destination.CLOSE};
-                        foreach(IToken token in tokens)
-                        {
-                            token.writeAss(builder, destination);
-                        }
-                        Console.WriteLine(builder);
-                        continue;
-                    }
-
-                    if (fileContent.EndsWith(".end\n"))
-                    {
-                        fileContent = fileContent.Substring(0, fileContent.Length - 5);
-                    }
-                    Lex(fileContent);
                 }
             }
             else if (args.Length == 1)
             {
-                string fileContent;
-                try
-                {
-                    fileContent = File.ReadAllText(args[0]);
-                }
-                catch (Exception ex)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Cannot read file {args[0]}");
-                    Console.WriteLine(ex.ToString());
-                    return;
-                }
-                Lex(fileContent);
+                Content.Analyze(args[0]);
+                Lex(true);
             }
             else
             {

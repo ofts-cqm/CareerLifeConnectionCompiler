@@ -10,14 +10,12 @@ namespace CLCC.codeblock
 
         public FunctionBlock(string name) : base(name) { }
 
-        public override bool match(ref string str, List<IToken> allTokens, out IToken? result, bool add = true)
+        public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
-            if (!str.StartsWith("func ")) return false;
-            str = str[5..];
+            if (!CLCC.Content.Match("func ")) return false;
 
-            string name = Tokens.matchName(ref str);
-            Tokens.fixString(ref str);
+            string name = Tokens.matchName();
 
             FunctionBlock block = new(name)
             {
@@ -25,11 +23,11 @@ namespace CLCC.codeblock
             };
             Lexer.Context.Push(block);
 
-            IToken token = Tokens.match(ref str, new(), false);
+            IToken token = Tokens.match(new(), false);
 
             if (token is not CodeBlock code)
             {
-                Console.WriteLine("Error: Expected Code Block, Found " + token.GetType());
+                CLCC.Content.LogError("Expected Code Block, Found " + token.GetType());
                 return false;
             }
 
