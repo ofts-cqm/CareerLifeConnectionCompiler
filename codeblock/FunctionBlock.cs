@@ -4,11 +4,19 @@ using System.Text;
 
 namespace CLCC.codeblock
 {
-    public class FunctionBlock : IBlockToken
+    public class FunctionBlock : IBlockToken, IExpressionBaseToken
     {
         public override string Type => "Function";
 
-        public FunctionBlock(string name) : base(name) { }
+        public DataType ReturnType = DataType.NULL;
+
+        DataType IExpressionBaseToken.Type
+        {
+            get { return ReturnType; }
+            set { ReturnType = value; }
+        }
+
+        public FunctionBlock(string name, DataType returnType) : base(name) { ReturnType = returnType; }
 
         public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
@@ -17,7 +25,12 @@ namespace CLCC.codeblock
 
             string name = Tokens.matchName();
 
-            FunctionBlock block = new(name)
+            if(!DataType.TryParseDataType(out DataType type))
+            {
+                type = DataType.NULL;
+                CLCC.Content.LogWarn("Unknown Datatype");
+            }
+            FunctionBlock block = new(name, type)
             {
                 Parent = Lexer.Current
             };

@@ -2,7 +2,7 @@
 
 namespace CLCC.tokens
 {
-    public abstract class IExpressionToken: IToken
+    public abstract class IExpressionToken: IExpressionBaseToken
     {
         public IExpressionToken(DataType type)
         {
