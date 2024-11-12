@@ -92,7 +92,7 @@ namespace CLCC
                 }
                 else if(readValue == ".clear")
                 {
-                    Lexer.tokens.Clear();
+                    Lexer.Reset();
                     Console.Clear();
                     read.Clear();
                     continue;

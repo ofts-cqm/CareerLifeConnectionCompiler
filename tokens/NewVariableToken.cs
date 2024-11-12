@@ -5,9 +5,9 @@ namespace CLCC.tokens
 {
     public class NewVariableToken : IToken
     {
-        public LocalVariableToken Variable { get; set; }
+        public IValueToken Variable { get; set; }
 
-        public NewVariableToken(LocalVariableToken variable)
+        public NewVariableToken(IValueToken variable)
         {
             Variable = variable;
         }
@@ -20,8 +20,23 @@ namespace CLCC.tokens
             if (!DataType.TryParseDataType(out DataType type)) return false;
             string name = Tokens.matchName();
 
-            Variable = new(Lexer.Current?.LocalValue.Count ?? 0, name, type);//new(Lexer.LocalVariables.Count, name);
-            Lexer.Current?.LocalValue.Add(name, Variable);//Lexer.LocalVariables.Add(name, Variable);
+            if (Lexer.Current is not null)
+            {
+                Variable = new LocalVariableToken(Lexer.Current.LocalValue.Count, name, type);
+                if(!Lexer.Current.LocalValue.TryAdd(name, (LocalVariableToken)Variable))
+                {
+                    Content.LogWarn("Repetitive Variable Declaration");
+                }
+            }
+            else
+            {
+                Variable = new GlobalVariableToken(type, name, --Lexer.CurrentOffset);
+                if (!Lexer.GlobalVariables.TryAdd(name, (GlobalVariableToken)Variable))
+                {
+                    Content.LogWarn("Repetitive Variable Declaration");
+                }
+            }
+            
             result = new NewVariableToken(Variable);
             if (add) allTokens.Add(Variable);
             return true;

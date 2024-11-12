@@ -12,8 +12,17 @@ namespace clcc
         public static Stack<IBlockToken> Context = new();
         public static Dictionary<string, GlobalVariableToken> GlobalVariables = new();
         public static IBlockToken? Current => Context.Count > 0 ? Context.Peek() : null;
+        public static int CurrentOffset = 1024*1024;
 
         public static bool GetVariable(string name, out GlobalVariableToken variableToken) => GlobalVariables.TryGetValue(name, out variableToken); 
+
+        public static void Reset()
+        {
+            tokens.Clear();
+            Context.Clear();
+            GlobalVariables.Clear();
+            CurrentOffset = 1024 * 1024;
+        }
 
         public static void Lex(bool print)
         {

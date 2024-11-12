@@ -29,6 +29,13 @@ namespace CLCC.tokens
                 Content.Ignore();
                 return true;
             }
+            else if (Lexer.GlobalVariables.TryGetValue(name, out GlobalVariableToken token2))//if (Lexer.LocalVariables.TryGetValue(name, out LocalVariableToken? token))
+            {
+                if (add) allTokens.Add(token2);
+                result = token2;
+                Content.Ignore();
+                return true;
+            }
 
             Content.Pop();
             return false;

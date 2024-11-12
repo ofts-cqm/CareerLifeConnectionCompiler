@@ -4,17 +4,11 @@ using System.Text;
 
 namespace CLCC.codeblock
 {
-    public class FunctionBlock : IBlockToken, IExpressionBaseToken
+    public class FunctionBlock : IBlockToken
     {
         public override string Type => "Function";
 
         public DataType ReturnType = DataType.NULL;
-
-        DataType IExpressionBaseToken.Type
-        {
-            get { return ReturnType; }
-            set { ReturnType = value; }
-        }
 
         public FunctionBlock(string name, DataType returnType) : base(name) { ReturnType = returnType; }
 
@@ -23,13 +17,14 @@ namespace CLCC.codeblock
             result = null;
             if (!CLCC.Content.Match("func ")) return false;
 
-            string name = Tokens.matchName();
-
             if(!DataType.TryParseDataType(out DataType type))
             {
                 type = DataType.NULL;
                 CLCC.Content.LogWarn("Unknown Datatype");
             }
+
+            string name = Tokens.matchName();
+
             FunctionBlock block = new(name, type)
             {
                 Parent = Lexer.Current
@@ -49,6 +44,12 @@ namespace CLCC.codeblock
             if(add) allTokens.Add(block);
             result = block;
             return true;
+        }
+
+        public override void print(string indentation)
+        {
+            Console.Write($"Function {Name}::{ReturnType}: ");
+            Content.print(indentation + "    ");
         }
 
         public override void writeAss(StringBuilder file, Destination destination)

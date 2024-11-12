@@ -13,8 +13,17 @@ namespace CLCC.tokens
             result = null;
             if (!Content.Match("=")) return false;
 
-            if (allTokens.Last() is LocalVariableToken variable)
+            IValueToken? variable = null;
+            if (allTokens.Last() is LocalVariableToken local)
             {
+                variable = local;
+            }
+            else if (allTokens.Last() is GlobalVariableToken global)
+            {
+                variable = global;
+            }
+            
+            if (variable is not null){
                 IExpressionToken? token = Tokens.match(allTokens, false) as IExpressionToken;
 
                 if(token is null)

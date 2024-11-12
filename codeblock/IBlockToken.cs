@@ -31,10 +31,10 @@ namespace CLCC.codeblock
 
         public abstract bool match(List<IToken> allTokens, out IToken? result, bool add = true);
 
-        public void print(string indentation)
+        public virtual void print(string indentation)
         {
             Console.Write(indentation + Type + " " + Name + " ");
-            Content.print(indentation);
+            Content.print(indentation + "    ");
         }
 
         public abstract void writeAss(StringBuilder file, Destination destination);
