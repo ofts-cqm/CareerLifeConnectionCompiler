@@ -29,7 +29,7 @@ namespace CLCC
 
         public override string ToString()
         {
-            return isPrimitive ? name : "class " + name;
+            return isPrimitive ? name : "class_" + name;
         }
 
         public override bool Equals(object? obj)

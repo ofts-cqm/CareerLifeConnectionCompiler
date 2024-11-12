@@ -34,7 +34,7 @@ namespace CLCC.codeblock
         public virtual void print(string indentation)
         {
             Console.Write(indentation + Type + " " + Name + " ");
-            Content.print(indentation + "    ");
+            Content.print(indentation);
         }
 
         public abstract void writeAss(StringBuilder file, Destination destination);

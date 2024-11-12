@@ -9,6 +9,7 @@ namespace clcc
     {
         //public static Dictionary<string, LocalVariableToken> LocalVariables { get; set; } = new();
         public static List<IToken> tokens = new();
+        public static Dictionary<string, FunctionBlock> Functions = new();
         public static Stack<IBlockToken> Context = new();
         public static Dictionary<string, GlobalVariableToken> GlobalVariables = new();
         public static IBlockToken? Current => Context.Count > 0 ? Context.Peek() : null;
@@ -21,6 +22,7 @@ namespace clcc
             tokens.Clear();
             Context.Clear();
             GlobalVariables.Clear();
+            Functions.Clear();
             CurrentOffset = 1024 * 1024;
         }
 
@@ -34,9 +36,18 @@ namespace clcc
             }
             while (token is not EndOfFileToken);
 
-            if (print) foreach (IToken token1 in tokens)
+            if (print)
             {
-                token1.print("");
+                Console.WriteLine("Tokens:\n");
+                foreach (IToken token1 in tokens)
+                {
+                    if (token1 is not FunctionBlock) token1.print("");
+                }
+                Console.WriteLine("Functions:\n");
+                foreach(FunctionBlock fb in Functions.Values)
+                {
+                    fb.print("");
+                }
             }
 
             Console.WriteLine("Lexing Finished");

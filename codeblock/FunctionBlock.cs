@@ -9,18 +9,20 @@ namespace CLCC.codeblock
         public override string Type => "Function";
 
         public DataType ReturnType = DataType.NULL;
+        public ParameterBlock parameters;
+        public bool finished = false;
 
         public FunctionBlock(string name, DataType returnType) : base(name) { ReturnType = returnType; }
 
         public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
-            if (!CLCC.Content.Match("func ")) return false;
 
+            CLCC.Content.Push();
             if(!DataType.TryParseDataType(out DataType type))
             {
-                type = DataType.NULL;
-                CLCC.Content.LogWarn("Unknown Datatype");
+                CLCC.Content.Pop();
+                return false;
             }
 
             string name = Tokens.matchName();
@@ -31,16 +33,41 @@ namespace CLCC.codeblock
             };
             Lexer.Context.Push(block);
 
+            if (ParameterBlock.Instance.match(new(), out IToken? para, false) && para is ParameterBlock paraBlock)
+            {
+                block.parameters = paraBlock;
+                if (Lexer.Functions.TryGetValue(name + paraBlock.ToString(), out FunctionBlock func))
+                {
+                    block = func;
+                    Lexer.Context.Pop();
+                    Lexer.Context.Push(func);
+                    add = false;
+                }
+            }
+            else
+            {
+                CLCC.Content.Pop();
+                Lexer.Context.Pop();
+                return NewVariableToken.Instance.match(allTokens, out result, add);
+            }
+
+            CLCC.Content.Ignore();
+            CLCC.Content.Push();
             IToken token = Tokens.match(new(), false);
 
             if (token is not CodeBlock code)
             {
-                CLCC.Content.LogError("Expected Code Block, Found " + token.GetType());
-                return false;
+                CLCC.Content.Pop();
+            }
+            else
+            {
+                block.Content = code;
+                block.finished = true;
+                CLCC.Content.Ignore();
             }
 
-            block.Content = code;
             Lexer.Context.Pop();
+            Lexer.Functions.TryAdd(name + paraBlock.ToString(), block);
             if(add) allTokens.Add(block);
             result = block;
             return true;
@@ -48,13 +75,13 @@ namespace CLCC.codeblock
 
         public override void print(string indentation)
         {
-            Console.Write($"Function {Name}::{ReturnType}: ");
-            Content.print(indentation + "    ");
+            Console.Write($"Function {Name}{parameters}::{ReturnType} ");
+            Content.print(indentation);
         }
 
         public override void writeAss(StringBuilder file, Destination destination)
         {
-            file.Append("label ").Append(Name).Append('\n');
+            file.Append("label func_").Append(Name).Append(parameters.assName()).Append('\n');
             file.Append("var|imm1 ").Append(LocalValue.Count + SubVariableCount).Append(" null null\n");
             Content.writeAss(file, new Destination() { Type = Destination.CLOSE});
             file.Append("ret null null null\n");

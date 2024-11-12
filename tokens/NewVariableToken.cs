@@ -7,6 +7,8 @@ namespace CLCC.tokens
     {
         public IValueToken Variable { get; set; }
 
+        public static NewVariableToken Instance = new();
+
         public NewVariableToken(IValueToken variable)
         {
             Variable = variable;

@@ -36,7 +36,7 @@ namespace CLCC.tokens
             new ExpressionParenthesisToken(),
             new CodeBlock(),
             new NumberToken(),
-            new NewVariableToken(),
+            //new NewVariableToken(),
             new LocalVariableToken()
         };
 
