@@ -23,6 +23,9 @@ namespace CLCC.codeblock
             }
         }
 
+        public FunctionBlock? BaseFunction => this is FunctionBlock func ? func : Parent?.BaseFunction ?? null;
+        public int LocalCount => (Parent?.LocalCount ?? 0) + LocalValue.Count;
+
         public IBlockToken(string name)
         {
             Name = name;

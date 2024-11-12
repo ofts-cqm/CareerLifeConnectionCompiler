@@ -24,7 +24,7 @@ namespace CLCC.tokens
 
             if (Lexer.Current is not null)
             {
-                Variable = new LocalVariableToken(Lexer.Current.LocalValue.Count, name, type);
+                Variable = new LocalVariableToken(Lexer.Current.LocalCount, name, type);
                 if(!Lexer.Current.LocalValue.TryAdd(name, (LocalVariableToken)Variable))
                 {
                     Content.LogWarn("Repetitive Variable Declaration");

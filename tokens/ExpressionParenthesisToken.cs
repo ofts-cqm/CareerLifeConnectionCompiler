@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using clcc;
+using System.Text;
 
 namespace CLCC.tokens
 {
@@ -24,9 +25,9 @@ namespace CLCC.tokens
 
                 if (result1.insideTokens.Count > 1)
                 {
-                    Content.LogError("ExpressionParenthesisToken is expected to contain only one token");
-                    result = null;
-                    return false;
+                    result = new FunctionArgumentsToken(result1.insideTokens, Lexer.Current.BaseFunction);
+                    if (add) allTokens.Add(result);
+                    return true;
                 }
 
                 if (result1.insideTokens[0] is not IExpressionToken expression)
