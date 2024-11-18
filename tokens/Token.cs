@@ -18,6 +18,7 @@ namespace CLCC.tokens
         public static IToken[] registeredTokens = new IToken[]
         {
             new EndOfFileToken(),
+            new FunctionCallToken("", null, DataType.NULL),
             new FunctionBlock("", DataType.NULL),
             new AssignOperatorToken(),
             new BinaryOperatorToken("*", 4),
@@ -67,6 +68,7 @@ namespace CLCC.tokens
             }
 
             Content.LogError("Failed to read token");
+            Content.AdvanceRow();
             return new EndOfFileToken();
         }
 

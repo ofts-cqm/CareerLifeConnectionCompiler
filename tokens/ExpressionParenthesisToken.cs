@@ -23,9 +23,9 @@ namespace CLCC.tokens
                     matched = Tokens.match(result1.insideTokens);
                 }
 
-                if (result1.insideTokens.Count > 1)
+                if (result1.insideTokens.Count > 1 || result1.insideTokens.Count == 0)
                 {
-                    result = new FunctionArgumentsToken(result1.insideTokens, Lexer.Current.BaseFunction);
+                    result = new FunctionArgumentsToken(result1.insideTokens, Lexer.Current?.BaseFunction);
                     if (add) allTokens.Add(result);
                     return true;
                 }

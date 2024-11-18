@@ -73,10 +73,15 @@ namespace CLCC.codeblock
 
         public string assName()
         {
-            StringBuilder str = new("_");
+            if (parameters.Length == 0)
+            {
+                return "_noPara";
+            }
+
+            StringBuilder str = new();
             foreach (LocalVariableToken token in parameters)
             {
-                str.Append(token.Type.ToString() + "_");
+                str.Append('_').Append(token.Type.ToString());
             }
             return str.ToString();
         }

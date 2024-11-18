@@ -32,6 +32,11 @@ namespace CLCC
             }
         }
 
+        public static void AdvanceRow()
+        {
+            currentLine++;
+        }
+
         public static void Push()
         {
             stack.Push(new KeyValuePair<int, int>(currentLine, currentPosition));
@@ -80,6 +85,11 @@ namespace CLCC
                 Console.Write(">");
                 string readValue = Console.ReadLine() ?? "";
 
+                if (readValue == "")
+                {
+                    continue;
+                }
+
                 if (!readValue.StartsWith('.'))
                 {
                     read.Add(readValue);
@@ -116,13 +126,10 @@ namespace CLCC
 
         public static void Fix()
         {
-            string a= Current;
             while (currentLine < fileContent.Length && (CurrentChar == ' ' || CurrentChar == '\n' || CurrentChar == '\r' || CurrentChar == '\t' || CurrentChar == ';' || CurrentChar == ','))
             {
                 Advance();
-
             }
-            string b = Current;
         }
 
         public static bool IsEnd() => currentLine >= fileContent.Length;

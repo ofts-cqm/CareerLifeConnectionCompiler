@@ -10,6 +10,7 @@ namespace clcc
         //public static Dictionary<string, LocalVariableToken> LocalVariables { get; set; } = new();
         public static List<IToken> tokens = new();
         public static Dictionary<string, FunctionBlock> Functions = new();
+        public static HashSet<string> RawFunctions = new();
         public static Stack<IBlockToken> Context = new();
         public static Dictionary<string, GlobalVariableToken> GlobalVariables = new();
         public static IBlockToken? Current => Context.Count > 0 ? Context.Peek() : null;
@@ -23,6 +24,7 @@ namespace clcc
             Context.Clear();
             GlobalVariables.Clear();
             Functions.Clear();
+            RawFunctions.Clear();
             CurrentOffset = 1024 * 1024;
         }
 
