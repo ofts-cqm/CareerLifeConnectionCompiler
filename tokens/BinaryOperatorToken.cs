@@ -19,8 +19,7 @@ namespace CLCC.tokens
             { "^", "xor" }
         };
 
-        public static Destination FirstDestination = new() { OffSet = 4, Type = Destination.REGISTER};
-        public static Destination SecondDestination = new() { OffSet = 5, Type = Destination.REGISTER };
+        public static Destination SecondDestination = new() { OffSet = 4, Type = Destination.REGISTER };
 
         public string Operator { get; set; }
         public int Precedence { get; set; }
@@ -38,11 +37,19 @@ namespace CLCC.tokens
                 Content.LogError("Expected Expression");
                 return false;
             }
-
+            
             if (allTokens.Count > 0 && allTokens.Last() is BinaryOperatorToken opToken
                 && opToken.Precedence < Precedence)
             {
-                opToken.Right = new BinaryOperatorToken(Operator, Precedence, opToken.Right, right);
+                IExpressionToken target = opToken;
+                BinaryOperatorToken last = opToken;
+                while (target is BinaryOperatorToken binOp && binOp.Precedence < Precedence) 
+                {
+                    last = binOp;
+                    target = binOp.Right;
+                }
+
+                last.Right = new BinaryOperatorToken(Operator, Precedence, last.Right, right);
                 result = opToken;
             }
             else
@@ -114,36 +121,15 @@ namespace CLCC.tokens
 
         public override void writeAss(StringBuilder file, Destination destination)
         {
-            StringBuilder code = new StringBuilder().Append(CodeName);
-            bool shoudPop = false, usedRegister = false;
-
-            string leftValue;
+            if (destination.Type == Destination.CLOSE)
             {
-                if (Left is IValueToken value)
-                {
-                    var pair = value.getVariabele(1);
-                    code.Append(pair.Key);
-                    leftValue = pair.Value;
-                }
-                else
-                {
-                    if (Tokens.registerUsed < 4)
-                    {
-                        Left.writeAss(file, new Destination()
-                        { Type = Destination.REGISTER, OffSet = Tokens.registerUsed });
-                        leftValue = Destination.RegisterName[Tokens.registerUsed++];
-                        usedRegister = true;
-                    }
-                    else
-                    {
-                        shoudPop = true;
-                        Left.writeAss(file, FirstDestination);
-                        file.Append("push edi null null\n");
-                        leftValue = "edi";
-                    }
-
-                }
+                Left.writeAss(file, destination);
+                Right.writeAss(file, destination);
+                return;
             }
+
+            StringBuilder code = new StringBuilder().Append(CodeName);
+            bool shoudPop = false;
 
             string rightValue;
             {
@@ -155,19 +141,46 @@ namespace CLCC.tokens
                 }
                 else
                 {
-                    Right.writeAss(file, SecondDestination);
-                    rightValue = "esi";
+                    if (Tokens.registerUsed == 5)
+                    {
+                        Right.writeAss(file, SecondDestination);
+                        rightValue = "esi";
+                        file.Append("push edi null null");
+                        shoudPop = true;
+                    }
+                    else
+                    {
+                        Right.writeAss(file, new Destination() { OffSet = Tokens.registerUsed++, Type=Destination.REGISTER});
+                        rightValue = Destination.RegisterName[--Tokens.registerUsed];
+                    }
                 }
             }
 
-            if (usedRegister)
+            string leftValue;
             {
-                Tokens.registerUsed--;
+                if (Left is IValueToken value)
+                {
+                    var pair = value.getVariabele(1);
+                    code.Append(pair.Key);
+                    leftValue = pair.Value;
+                }
+                else
+                {
+                    Left.writeAss(file, destination);
+                    if (destination.Type == Destination.REGISTER)
+                    {
+                        leftValue = Destination.RegisterName[destination.OffSet];
+                    }
+                    else
+                    {
+                        leftValue = destination.OffSet.ToString();
+                    }
+                }
             }
 
             if (shoudPop)
             {
-                file.Append("pop null null edi");
+                file.Append("pop null null esi");
             }
 
             decodeDestination(destination, code, out string endValue);
