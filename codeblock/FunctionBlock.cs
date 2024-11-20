@@ -11,9 +11,17 @@ namespace CLCC.codeblock
         public DataType ReturnType = DataType.NULL;
         public ParameterBlock parameters;
         public bool finished = false;
+        public bool returned = false;
         public string ID => "func_" + Name + parameters.assName();
 
         public FunctionBlock(string name, DataType returnType) : base(name) { ReturnType = returnType; }
+
+        public override bool TryReturn(IExpressionToken? expression)
+        {
+            if ((expression?.Type ?? DataType.NULL) != ReturnType) return false;
+            returned = true;
+            return true;
+        }
 
         public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
@@ -52,7 +60,7 @@ namespace CLCC.codeblock
                 return NewVariableToken.Instance.match(allTokens, out result, add);
             }
 
-            if(!Lexer.Functions.TryAdd(block.ID, block))
+            if(!Lexer.Functions.TryAdd(block.ID, block) && Lexer.Functions.TryGetValue(block.ID, out FunctionBlock existingBlock) && existingBlock.Content != null)
             {
                 CLCC.Content.Ignore();
                 CLCC.Content.LogError("Duplicate Function Declaration");
@@ -92,7 +100,6 @@ namespace CLCC.codeblock
             file.Append("label ").Append(ID).Append('\n');
             file.Append("var|imm1 ").Append(LocalValue.Count + SubVariableCount).Append(" null null\n");
             Content.writeAss(file, new Destination() { Type = Destination.CLOSE});
-            file.Append("ret null null null\n");
         }
     }
 }

@@ -18,6 +18,8 @@ namespace CLCC.tokens
         public static IToken[] registeredTokens = new IToken[]
         {
             new EndOfFileToken(),
+            new EndOfStatementToken(),
+            new ReturnToken(null),
             new FunctionCallToken("", null, DataType.NULL),
             new FunctionBlock("", DataType.NULL),
             new AssignOperatorToken(),

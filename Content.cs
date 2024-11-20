@@ -126,7 +126,7 @@ namespace CLCC
 
         public static void Fix()
         {
-            while (currentLine < fileContent.Length && (CurrentChar == ' ' || CurrentChar == '\n' || CurrentChar == '\r' || CurrentChar == '\t' || CurrentChar == ';' || CurrentChar == ','))
+            while (currentLine < fileContent.Length && (CurrentChar == ' ' || CurrentChar == '\n' || CurrentChar == '\r' || CurrentChar == '\t' || CurrentChar == ','))
             {
                 Advance();
             }
