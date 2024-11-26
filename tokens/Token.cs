@@ -13,7 +13,8 @@ namespace CLCC.tokens
 
     public class Tokens
     {
-        public static int registerUsed = 0;
+        public static int registerUsed { get;
+            set; } = 0;
 
         public static IToken[] registeredTokens = new IToken[]
         {

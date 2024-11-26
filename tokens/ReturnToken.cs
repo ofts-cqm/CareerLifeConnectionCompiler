@@ -86,10 +86,12 @@ namespace CLCC.tokens
                 }
                 else
                 {
+                    Tokens.registerUsed++;
                     value.writeAss(file, EAX);
+                    Tokens.registerUsed--;
                 }
             }
-            file.Append("ret null null null");
+            file.Append("ret null null null\n");
         }
     }
 }

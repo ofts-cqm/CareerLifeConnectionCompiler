@@ -81,6 +81,10 @@ namespace CLCC.codeblock
                 block.Content = code;
                 block.finished = true;
                 CLCC.Content.Ignore();
+                if (type != DataType.NULL && !block.returned)
+                {
+                    CLCC.Content.LogError("Not all code retruned a value");
+                }
             }
 
             Lexer.Context.Pop();
@@ -100,6 +104,7 @@ namespace CLCC.codeblock
             file.Append("label ").Append(ID).Append('\n');
             file.Append("var|imm1 ").Append(LocalValue.Count + SubVariableCount).Append(" null null\n");
             Content.writeAss(file, new Destination() { Type = Destination.CLOSE});
+            if (!returned) file.Append("ret null null null\n");
         }
     }
 }

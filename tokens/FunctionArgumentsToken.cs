@@ -52,9 +52,9 @@ namespace CLCC.tokens
 
         public void writeAss(StringBuilder file, Destination destination)
         {
-            for (int i = 0; i < Tokens.registerUsed; i++)
+            for (int i = 0; i < Tokens.registerUsed - 1; i++)
             {
-                file.Append($"push {Destination.RegisterName[i]} null null");
+                file.Append($"push {Destination.RegisterName[i]} null null\n");
             }
             int offset = currentContext != null ? currentContext.LocalCount + currentContext.SubVariableCount + 2 : 2;
             for (int i = 0; i < insideTokens.Count; i++)
@@ -70,10 +70,6 @@ namespace CLCC.tokens
                     file.Append("mov|imm3|mem3|sta3").Append(variable.Key).Append(' ')
                         .Append(variable.Value).Append(" null ").Append(offset + i).Append('\n');
                 }
-            }
-            for (int i = 0; i < Tokens.registerUsed; i++)
-            {
-                file.Append($"pop null null {Destination.RegisterName[i]}");
             }
         }
     }

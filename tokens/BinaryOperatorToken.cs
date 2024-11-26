@@ -131,6 +131,28 @@ namespace CLCC.tokens
             StringBuilder code = new StringBuilder().Append(CodeName);
             bool shoudPop = false;
 
+            string leftValue;
+            {
+                if (Left is IValueToken value)
+                {
+                    var pair = value.getVariabele(1);
+                    code.Append(pair.Key);
+                    leftValue = pair.Value;
+                }
+                else
+                {
+                    Left.writeAss(file, destination);
+                    if (destination.Type == Destination.REGISTER)
+                    {
+                        leftValue = Destination.RegisterName[destination.OffSet];
+                    }
+                    else
+                    {
+                        leftValue = destination.OffSet.ToString();
+                    }
+                }
+            }
+
             string rightValue;
             {
                 if (Right is IValueToken value)
@@ -150,30 +172,8 @@ namespace CLCC.tokens
                     }
                     else
                     {
-                        Right.writeAss(file, new Destination() { OffSet = Tokens.registerUsed++, Type=Destination.REGISTER});
+                        Right.writeAss(file, new Destination() { OffSet = Tokens.registerUsed++, Type = Destination.REGISTER });
                         rightValue = Destination.RegisterName[--Tokens.registerUsed];
-                    }
-                }
-            }
-
-            string leftValue;
-            {
-                if (Left is IValueToken value)
-                {
-                    var pair = value.getVariabele(1);
-                    code.Append(pair.Key);
-                    leftValue = pair.Value;
-                }
-                else
-                {
-                    Left.writeAss(file, destination);
-                    if (destination.Type == Destination.REGISTER)
-                    {
-                        leftValue = Destination.RegisterName[destination.OffSet];
-                    }
-                    else
-                    {
-                        leftValue = destination.OffSet.ToString();
                     }
                 }
             }
