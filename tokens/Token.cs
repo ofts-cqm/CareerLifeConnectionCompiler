@@ -20,6 +20,7 @@ namespace CLCC.tokens
         {
             new EndOfFileToken(),
             new EndOfStatementToken(),
+            new EndOfItemToken(),
             new ReturnToken(null),
             new FunctionCallToken("", null, DataType.NULL),
             new FunctionBlock("", DataType.NULL),
@@ -40,7 +41,7 @@ namespace CLCC.tokens
             new ExpressionParenthesisToken(),
             new CodeBlock(),
             new NumberToken(),
-            //new NewVariableToken(),
+            new NewVariableToken(),
             new LocalVariableToken()
         };
 
@@ -61,6 +62,7 @@ namespace CLCC.tokens
 
         public static IToken match(List<IToken> allTokens, bool add = true)
         {
+            Pos pos = Content.GetPos();
             foreach (IToken token in registeredTokens)
             {
                 if (token.match(allTokens, out IToken? result, add))
@@ -70,7 +72,7 @@ namespace CLCC.tokens
                 }   
             }
 
-            Content.LogError("Failed to read token");
+            Content.LogError("Failed to read token", pos);
             Content.AdvanceRow();
             return new EndOfFileToken();
         }

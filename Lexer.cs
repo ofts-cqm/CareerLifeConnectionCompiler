@@ -9,6 +9,7 @@ namespace clcc
     {
         //public static Dictionary<string, LocalVariableToken> LocalVariables { get; set; } = new();
         public static List<IToken> tokens = new();
+        public static Dictionary<GlobalVariableToken, AssignOperatorToken> initTokens = new();
         public static Dictionary<string, FunctionBlock> Functions = new();
         public static HashSet<string> RawFunctions = new();
         public static Stack<IBlockToken> Context = new();
@@ -25,6 +26,7 @@ namespace clcc
             GlobalVariables.Clear();
             Functions.Clear();
             RawFunctions.Clear();
+            initTokens.Clear();
             CurrentOffset = 1024 * 1024;
         }
 
@@ -40,15 +42,20 @@ namespace clcc
 
             if (print)
             {
-                Console.WriteLine("Tokens:\n");
-                foreach (IToken token1 in tokens)
+                Console.WriteLine("Globals:\n");
+                foreach(AssignOperatorToken assign in initTokens.Values)
                 {
-                    if (token1 is not FunctionBlock) token1.print("");
+                    assign.print("");
                 }
                 Console.WriteLine("Functions:\n");
                 foreach(FunctionBlock fb in Functions.Values)
                 {
                     fb.print("");
+                }
+                Console.WriteLine("Out of Context Tokens:\n");
+                foreach (IToken token1 in tokens)
+                {
+                    if (token1 is not FunctionBlock) token1.print("");
                 }
             }
 
@@ -65,7 +72,12 @@ namespace clcc
                     Lex(!compile);
                     if (compile)
                     {
-                        StringBuilder sb = new StringBuilder();
+                        StringBuilder sb = new StringBuilder("label segment_code\n");
+                        foreach (AssignOperatorToken token in initTokens.Values)
+                        {
+                            token.writeAss(sb, new() { Type = Destination.CLOSE });
+                        }
+                        sb.Append("call|imm1 func_main_noPara null null\n");
                         foreach (IToken token in tokens)
                         {
                             token.writeAss(sb, new() { Type = Destination.CLOSE });

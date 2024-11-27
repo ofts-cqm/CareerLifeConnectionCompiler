@@ -25,6 +25,7 @@ namespace CLCC.tokens
 
                 if (result1.insideTokens.Count > 1 || result1.insideTokens.Count == 0)
                 {
+                    result1.insideTokens.RemoveAll(x => x is EndOfItemToken);
                     result = new FunctionArgumentsToken(result1.insideTokens, Lexer.Current?.BaseFunction);
                     if (add) allTokens.Add(result);
                     return true;

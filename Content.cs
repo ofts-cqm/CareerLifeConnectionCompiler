@@ -4,6 +4,17 @@ using System.Text;
 
 namespace CLCC
 {
+    public struct Pos
+    {
+        public readonly int line, pos;
+
+        public Pos(int line, int pos)
+        {
+            this.line = line;
+            this.pos = pos;
+        }
+    }
+
     public class Content
     {
         private static string[] fileContent = Array.Empty<string>();
@@ -21,6 +32,8 @@ namespace CLCC
             currentPosition = 0;
             stack.Clear();
         }
+
+        public static Pos GetPos() => new Pos(currentLine, currentPosition);
 
         public static void Advance()
         {
@@ -126,9 +139,19 @@ namespace CLCC
 
         public static void Fix()
         {
-            while (currentLine < fileContent.Length && (CurrentChar == ' ' || CurrentChar == '\n' || CurrentChar == '\r' || CurrentChar == '\t' || CurrentChar == ','))
+            while (true)
             {
-                Advance();
+                if (currentLine >= fileContent.Length) break;
+
+                if (CurrentChar == ' ' || CurrentChar == '\n' || CurrentChar == '\r' || CurrentChar == '\t') Advance();
+                else if (Get(2) == "//") AdvanceRow();
+                else if (Get(2) == "/*")
+                {
+                    Advance();
+                    Advance();
+                    while (Get(2) == "*/") Advance();
+                }
+                else break;
             }
         }
 
@@ -145,28 +168,32 @@ namespace CLCC
             return false;
         }
 
-        public static void LogError(string message)
+        public static void LogError(string message, Pos? position = null)
         {
+            int curPos = position?.pos ?? currentPosition;
+            int curLine = position?.line ?? currentLine;
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Error: {message}");
-            Console.WriteLine($"At line {currentLine} character {currentPosition}:");
-            Console.WriteLine(Current);
-            char[] pos = new char[Current.Length];
+            Console.WriteLine($"At line {curLine} character {curPos}:");
+            Console.WriteLine(fileContent[curLine]);
+            char[] pos = new char[fileContent[curLine].Length];
             Array.Fill(pos, '~');
-            pos[currentPosition] = '^';
+            pos[curPos] = '^';
             Console.WriteLine(pos);
             Console.ResetColor();
         }
 
-        public static void LogWarn(string message)
+        public static void LogWarn(string message, Pos? position = null)
         {
+            int curPos = position?.pos ?? currentPosition;
+            int curLine = position?.line ?? currentLine;
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"Warn: {message}");
-            Console.WriteLine($"At line {currentLine} character {currentPosition}:");
-            Console.WriteLine(Current);
-            char[] pos = new char[Current.Length];
+            Console.WriteLine($"At line {curLine} character {curPos}:");
+            Console.WriteLine(fileContent[curLine]);
+            char[] pos = new char[fileContent[curLine].Length];
             Array.Fill(pos, '~');
-            pos[currentPosition] = '^';
+            pos[curPos] = '^';
             Console.WriteLine(pos);
             Console.ResetColor();
         }

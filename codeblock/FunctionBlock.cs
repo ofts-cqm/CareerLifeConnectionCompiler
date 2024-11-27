@@ -34,7 +34,9 @@ namespace CLCC.codeblock
                 return false;
             }
 
+            Pos namePos = CLCC.Content.GetPos();
             string name = Tokens.matchName();
+            CLCC.Content.Push();
 
             FunctionBlock block = new(name, type)
             {
@@ -52,18 +54,19 @@ namespace CLCC.codeblock
                     Lexer.Context.Push(func);
                     add = false;
                 }
+                CLCC.Content.Ignore();
             }
             else
             {
-                CLCC.Content.Pop();
                 Lexer.Context.Pop();
-                return NewVariableToken.Instance.match(allTokens, out result, add);
+                CLCC.Content.Pop();
+                return NewVariableToken.Instance.match(type, name, namePos, allTokens, out result, add);
             }
 
             if(!Lexer.Functions.TryAdd(block.ID, block) && Lexer.Functions.TryGetValue(block.ID, out FunctionBlock existingBlock) && existingBlock.Content != null)
             {
                 CLCC.Content.Ignore();
-                CLCC.Content.LogError("Duplicate Function Declaration");
+                CLCC.Content.LogError("Duplicate Function Declaration", namePos);
                 return true;
             }
             Lexer.RawFunctions.Add(name);

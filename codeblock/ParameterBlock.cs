@@ -24,7 +24,10 @@ namespace CLCC.codeblock
                 while (!(matched is ExpressionParenthesisToken parenthesis && parenthesis.right))
                 {
                     matched = Tokens.match(generalTokens);
+                    NewVariableToken.IsCreatingNewVar = false;
                 }
+
+                generalTokens.RemoveAll(x => x is EndOfItemToken);
 
                 LocalVariableToken[] locals = new LocalVariableToken[generalTokens.Count];
                 for (int i = 0; i < generalTokens.Count; i++)

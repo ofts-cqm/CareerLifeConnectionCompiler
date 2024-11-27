@@ -66,7 +66,7 @@ namespace CLCC.tokens
         {
             Arguments.writeAss(file, destination);
             file.Append("call|imm1 ").Append(ID).Append(" null null\n");
-            
+
             if (destination.Type == Destination.REGISTER && destination.OffSet != 0)
             {
                 file.Append("mov eax null ").Append(Destination.RegisterName[destination.OffSet]).Append('\n');
@@ -75,7 +75,7 @@ namespace CLCC.tokens
             {
                 file.Append("mov|imm3|mem3|sta3 eax null ").Append(destination.OffSet).Append('\n');
             }
-            else if(destination.Type == Destination.HEAP) 
+            else if (destination.Type == Destination.HEAP)
             {
                 file.Append("mov|imm3|mem3 eax null ").Append(destination.OffSet).Append('\n');
             }

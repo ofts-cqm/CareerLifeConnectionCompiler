@@ -6,11 +6,13 @@ namespace CLCC.tokens
     {
         public int Offset { get; set; }
         public string Name { get; set; }
+        public bool Initialized { get; set; }
 
         public GlobalVariableToken(DataType type, string name, int offset) : base(type)
         {
             Name = name;
             Offset = offset;
+            Initialized = false;
         }
 
         public override Destination GetDestination()

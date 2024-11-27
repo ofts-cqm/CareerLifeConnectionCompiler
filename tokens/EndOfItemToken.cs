@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace CLCC.tokens
 {
-    internal class EndOfStatementToken : IToken
+    public class EndOfItemToken : IToken
     {
         public bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = this;
-            if(Content.Match(";"))
+            if (Content.Match(","))
             {
-                NewVariableToken.IsCreatingNewVar = false;
+                if (add) allTokens.Add(this);
                 return true;
             }
             return false;

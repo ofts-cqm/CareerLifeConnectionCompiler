@@ -8,6 +8,8 @@ namespace CLCC.tokens
         public IValueToken Variable { get; set; }
 
         public static NewVariableToken Instance = new();
+        public static bool IsCreatingNewVar = false;
+        public static DataType? CreatingType;
 
         public NewVariableToken(IValueToken variable)
         {
@@ -16,18 +18,18 @@ namespace CLCC.tokens
 
         public NewVariableToken() { }
 
-        public bool match(List<IToken> allTokens, out IToken? result, bool add = true)
+        public bool match(DataType type, string name, Pos namePos, List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
-            if (!DataType.TryParseDataType(out DataType type)) return false;
-            string name = Tokens.matchName();
+            IsCreatingNewVar = true;
+            CreatingType = type;
 
             if (Lexer.Current is not null)
             {
                 Variable = new LocalVariableToken(Lexer.Current.LocalCount, name, type);
-                if(!Lexer.Current.LocalValue.TryAdd(name, (LocalVariableToken)Variable))
+                if (!Lexer.Current.LocalValue.TryAdd(name, (LocalVariableToken)Variable))
                 {
-                    Content.LogWarn("Repetitive Variable Declaration");
+                    Content.LogWarn("Repetitive Variable Declaration", namePos);
                 }
             }
             else
@@ -35,13 +37,21 @@ namespace CLCC.tokens
                 Variable = new GlobalVariableToken(type, name, --Lexer.CurrentOffset);
                 if (!Lexer.GlobalVariables.TryAdd(name, (GlobalVariableToken)Variable))
                 {
-                    Content.LogWarn("Repetitive Variable Declaration");
+                    Content.LogWarn("Repetitive Variable Declaration", namePos);
                 }
             }
-            
+
             result = new NewVariableToken(Variable);
             if (add) allTokens.Add(Variable);
             return true;
+        }
+
+        public bool match(List<IToken> allTokens, out IToken? result, bool add = true)
+        {
+            result = null;
+            if (!IsCreatingNewVar || CreatingType is null) return false;
+            Pos namePos = Content.GetPos();
+            return match(CreatingType, Tokens.matchName(), namePos, allTokens, out result, add);
         }
 
         public void print(string indentation)
