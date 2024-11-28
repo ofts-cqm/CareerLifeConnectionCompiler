@@ -16,7 +16,8 @@ namespace CLCC.tokens
             { "||", "bor" },
             { "&", "and" },
             { "|", "or" },
-            { "^", "xor" }
+            { "^", "xor" },
+            { "==", "equ"}
         };
 
         public static Destination SecondDestination = new() { OffSet = 4, Type = Destination.REGISTER };
@@ -65,6 +66,10 @@ namespace CLCC.tokens
                 if (add) allTokens.Add(result);
             }
 
+            if (Operator == "==" || Operator == "&&" || Operator == "||")
+            {
+                ((BinaryOperatorToken)result).Type = DataType.BOOL;
+            }
             return true;
         }
 
