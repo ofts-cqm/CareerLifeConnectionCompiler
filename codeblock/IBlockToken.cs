@@ -32,6 +32,8 @@ namespace CLCC.codeblock
             Content = new CodeBlock();
         }
 
+        public virtual DataType ExpectedReturnType => Parent?.ExpectedReturnType ?? DataType.NULL;
+
         public abstract bool TryReturn(IExpressionToken? expression);
 
         public abstract bool match(List<IToken> allTokens, out IToken? result, bool add = true);

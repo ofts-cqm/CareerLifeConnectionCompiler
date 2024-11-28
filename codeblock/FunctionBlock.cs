@@ -23,6 +23,8 @@ namespace CLCC.codeblock
             return true;
         }
 
+        public override DataType ExpectedReturnType => ReturnType;
+
         public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
