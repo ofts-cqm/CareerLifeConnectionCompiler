@@ -23,6 +23,8 @@ namespace CLCC.tokens
             new EndOfItemToken(),
             new ReturnToken(null),
             new IfBlock(),
+            new WhileBlock(null),
+            new LoopBreakContinueToken(false, null),
             new FunctionCallToken("", null, DataType.NULL),
             new FunctionBlock("", DataType.NULL),
             new BinaryOperatorToken("==", 0),

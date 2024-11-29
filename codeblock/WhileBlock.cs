@@ -4,28 +4,24 @@ using System.Text;
 
 namespace CLCC.codeblock
 {
-    public class IfBlock : IConditionalBlock
+    public class WhileBlock : ILoopToken
     {
-        public ElseBlock? ElseBlock { get; set; } = null;
-        public bool returned = false;
-        public static int IfCount = 0;
+        public static int WhileCount = 0;
 
-        public IfBlock(IExpressionToken condition) : base($"If_{IfCount++}")
+        public WhileBlock(IExpressionToken Condition) : base($"While_{WhileCount++}")
         {
-            Condition = condition;
+            base.Condition = Condition;
         }
 
-        public IfBlock() : base("") { }
-
-        public override string Type => "If";
+        public override string Type => "While";
 
         public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
-            if (!CLCC.Content.Match("if")) return false;
+            if (!CLCC.Content.Match("while")) return false;
             if (Lexer.Current == null)
             {
-                CLCC.Content.LogError("If Statement Without Context");
+                CLCC.Content.LogError("While Statement Without Context");
                 return false;
             }
 
@@ -42,16 +38,16 @@ namespace CLCC.codeblock
                 CLCC.Content.LogWarn("Expression evaluate type is not int or bool", pos);
             }
 
-            IfBlock ifStatement = new((IExpressionToken)expression.insideTokens[0])
+            WhileBlock whileStatement = new((IExpressionToken)expression.insideTokens[0])
             {
                 Parent = Lexer.Current
             };
-            Lexer.Context.Push(ifStatement);
+            Lexer.Context.Push(whileStatement);
 
             pos = CLCC.Content.GetPos();
             List<IToken> parsed = new();
             IToken parsedToken = Tokens.match(parsed);
-            while(parsedToken is not CodeBlock && parsedToken is not EndOfStatementToken && parsedToken is not IBlockToken)
+            while (parsedToken is not CodeBlock && parsedToken is not EndOfStatementToken && parsedToken is not IBlockToken)
             {
                 parsedToken = Tokens.match(parsed);
             }
@@ -73,42 +69,19 @@ namespace CLCC.codeblock
             }
 
             Lexer.Context.Pop();
-            Lexer.Current.SubVariableCount = ifStatement.LocalValue.Count;
-            ifStatement.Content = parsedCode;
-            result = ifStatement;
-
-            ifStatement.ElseBlock = ElseBlock.match();
-            if (ifStatement.returned && (ifStatement.ElseBlock?.returned ?? false))
-            {
-                ifStatement.Parent.TryReturn(new NumberToken(1, DataType.BOOL));
-            }
-            if (add) allTokens.Add(ifStatement);
+            Lexer.Current.SubVariableCount = whileStatement.LocalValue.Count;
+            whileStatement.Content = parsedCode;
+            result = whileStatement;
+            if (add) allTokens.Add(whileStatement);
             return true;
-        }
-
-        public override bool TryReturn(IExpressionToken? expression)
-        {
-            if ((expression?.Type ?? DataType.NULL) != ExpectedReturnType) return false;
-            returned = true;
-            return true;
-        }
-
-        public override void print(string indentation)
-        {
-            base.print(indentation);
-            ElseBlock?.print(indentation);
         }
 
         public override void writeAss(StringBuilder file, Destination destination)
         {
-            writeCondition(file, $"{Name}_Else", false);
+            file.Append($"label {Name}_Start\n");
+            writeCondition(file, Name + "_End", false);
             Content.writeAss(file, new Destination { Type = Destination.CLOSE });
-            if (ElseBlock is not null)
-            {
-                file.Append($"jmp|imm1 {Name}_End\n");
-            }
-            file.Append($"label {Name}_Else\n");
-            ElseBlock?.writeAss(file, destination);
+            file.Append($"label {Name}_End");
         }
     }
 }
