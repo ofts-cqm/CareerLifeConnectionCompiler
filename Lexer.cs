@@ -11,10 +11,12 @@ namespace clcc
         public static List<IToken> tokens = new();
         public static Dictionary<GlobalVariableToken, AssignOperatorToken> initTokens = new();
         public static Dictionary<string, FunctionBlock> Functions = new();
+        public static HashSet<string> Structures = new();
         public static HashSet<string> RawFunctions = new();
         public static Stack<IBlockToken> Context = new();
         public static Dictionary<string, GlobalVariableToken> GlobalVariables = new();
         public static IBlockToken? Current => Context.Count > 0 ? Context.Peek() : null;
+        public static StructToken? CurrentStruct = null;
         public static int CurrentOffset = 1024*1024;
 
         public static bool GetVariable(string name, out GlobalVariableToken variableToken) => GlobalVariables.TryGetValue(name, out variableToken); 
@@ -27,6 +29,8 @@ namespace clcc
             Functions.Clear();
             RawFunctions.Clear();
             initTokens.Clear();
+            Structures.Clear();
+            DataType.Init();
             CurrentOffset = 1024 * 1024;
         }
 

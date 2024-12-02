@@ -9,15 +9,21 @@ namespace CLCC
         public static readonly DataType BOOL = new("bool");
         public static readonly DataType NULL = new("null");
 
-        public static List<DataType> RegisteredDataType = new() {INT, FLOAT, BOOL, NULL };
+        public static HashSet<DataType> RegisteredDataType = new() {INT, FLOAT, BOOL, NULL };
 
         public bool isPrimitive { get; set; }
         public string name { get; set; }
+
+        public static void Init()
+        {
+            RegisteredDataType = new() { INT, FLOAT, BOOL, NULL };
+        }
 
         public DataType(string name, bool isPrimitive = true)
         {
             this.isPrimitive = isPrimitive;
             this.name = name;
+            RegisteredDataType.Add(this);
         }
 
         public static bool operator==(DataType left, DataType right)

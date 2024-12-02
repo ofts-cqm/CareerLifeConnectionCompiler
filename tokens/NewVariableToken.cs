@@ -51,6 +51,7 @@ namespace CLCC.tokens
             result = null;
             if (!IsCreatingNewVar || CreatingType is null) return false;
             Pos namePos = Content.GetPos();
+            Content.Match("struct ");
             return match(CreatingType, Tokens.matchName(), namePos, allTokens, out result, add);
         }
 
