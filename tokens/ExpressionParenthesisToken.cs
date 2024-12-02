@@ -10,7 +10,9 @@ namespace CLCC.tokens
 
         public ExpressionParenthesisToken() : base(DataType.NULL) { }
 
-        public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
+        public override bool match(List<IToken> allTokens, out IToken? result, bool add = true) => match(allTokens, out result, add);
+
+        public static bool match(List<IToken> allTokens, out IToken? result, bool add = true, bool addNoEffectToken = false)
         {
             if (Content.Match("("))
             {
@@ -21,6 +23,8 @@ namespace CLCC.tokens
                 {
                     //insideTokens.Add(matched);
                     matched = Tokens.match(result1.insideTokens);
+                    if (addNoEffectToken && (matched is EndOfItemToken || matched is EndOfStatementToken))
+                        result1.insideTokens.Add(matched);
                 }
 
                 if (result1.insideTokens.Count > 1 || result1.insideTokens.Count == 0)

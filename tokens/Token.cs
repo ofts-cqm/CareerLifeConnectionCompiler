@@ -24,6 +24,7 @@ namespace CLCC.tokens
             new ReturnToken(null),
             new IfBlock(),
             new WhileBlock(null),
+            new ForBlock(),
             new LoopBreakContinueToken(false, null),
             new FunctionCallToken("", null, DataType.NULL),
             new FunctionBlock("", DataType.NULL),

@@ -23,6 +23,6 @@ namespace CLCC.codeblock
         }
 
         public void BreakLoop(StringBuilder file) => file.Append("jmp|imm3 null null ").Append(Name).AppendLine("_End");
-        public void ContinueLoop(StringBuilder file) => file.Append("jmp|imm3 null null ").Append(Name).AppendLine("_Start");
+        public virtual void ContinueLoop(StringBuilder file) => file.Append("jmp|imm3 null null ").Append(Name).AppendLine("_Start");
     }
 }
