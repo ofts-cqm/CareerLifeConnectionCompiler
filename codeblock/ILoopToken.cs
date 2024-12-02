@@ -7,6 +7,8 @@ namespace CLCC.codeblock
     {
         public List<LoopBreakContinueToken> breakTokens = new();
 
+        public static Stack<ILoopToken> InLoop = new();
+
         protected ILoopToken(string name) : base(name)
         {
         }

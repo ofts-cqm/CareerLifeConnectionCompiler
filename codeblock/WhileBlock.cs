@@ -44,6 +44,7 @@ namespace CLCC.codeblock
             };
             Lexer.Context.Push(whileStatement);
 
+            InLoop.Push(whileStatement);
             pos = CLCC.Content.GetPos();
             List<IToken> parsed = new();
             IToken parsedToken = Tokens.match(parsed);
@@ -73,6 +74,7 @@ namespace CLCC.codeblock
             whileStatement.Content = parsedCode;
             result = whileStatement;
             if (add) allTokens.Add(whileStatement);
+            InLoop.Pop();
             return true;
         }
 
@@ -81,7 +83,7 @@ namespace CLCC.codeblock
             file.Append($"label {Name}_Start\n");
             writeCondition(file, Name + "_End", false);
             Content.writeAss(file, new Destination { Type = Destination.CLOSE });
-            file.Append($"label {Name}_End");
+            file.Append($"label {Name}_End\n");
         }
     }
 }

@@ -19,7 +19,7 @@ namespace CLCC.codeblock
 
         public override void print(string indentation)
         {
-            Console.WriteLine($"{indentation}If Condition:");
+            Console.WriteLine($"{indentation}Condition:");
             Condition?.print(indentation + "    ");
             Console.WriteLine(indentation + "End Condition");
             base.print(indentation);

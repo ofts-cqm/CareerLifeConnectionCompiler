@@ -48,6 +48,7 @@ namespace CLCC
         public static void AdvanceRow()
         {
             currentLine++;
+            currentPosition = 0;
         }
 
         public static void Push()
@@ -203,6 +204,8 @@ namespace CLCC
             if (length + currentPosition <= Current.Length) 
                 return Current.Substring(currentPosition, length);
 
+            int i = currentPosition;
+            string str = Current;
             StringBuilder builder = new(Current[currentPosition..]);
             Push();
             while (length + currentPosition >= Current.Length)

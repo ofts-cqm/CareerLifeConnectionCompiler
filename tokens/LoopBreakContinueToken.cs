@@ -18,7 +18,7 @@ namespace CLCC.tokens
         public bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
-            if (Lexer.Current is not ILoopToken loop) return false;
+            if (!ILoopToken.InLoop.TryPeek(out ILoopToken loop)) return false;
             if (Content.Match("break"))
             {
                 result = new LoopBreakContinueToken(true, loop);
