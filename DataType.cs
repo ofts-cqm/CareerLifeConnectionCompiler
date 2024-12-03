@@ -4,19 +4,20 @@ namespace CLCC
 {
     public class DataType
     {
+        public static HashSet<DataType> RegisteredDataType { get; set; } = new();
+
         public static readonly DataType INT = new("int");
         public static readonly DataType FLOAT = new("float");
         public static readonly DataType BOOL = new("bool");
         public static readonly DataType NULL = new("null");
-
-        public static HashSet<DataType> RegisteredDataType = new() {INT, FLOAT, BOOL, NULL };
+        public static readonly DataType NULLPTR = new("nullptr", false);
 
         public bool isPrimitive { get; set; }
         public string name { get; set; }
 
         public static void Init()
         {
-            RegisteredDataType = new() { INT, FLOAT, BOOL, NULL };
+            RegisteredDataType = new() { INT, FLOAT, BOOL, NULL, NULLPTR };
         }
 
         public DataType(string name, bool isPrimitive = true)
@@ -35,7 +36,7 @@ namespace CLCC
 
         public override string ToString()
         {
-            return isPrimitive ? name : "class_" + name;
+            return isPrimitive ? name : "struct_" + name;
         }
 
         public override bool Equals(object? obj)

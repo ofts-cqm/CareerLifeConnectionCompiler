@@ -54,6 +54,11 @@ namespace CLCC.tokens
                     assign.Left.Type = assign.Right.Type;
                 }
 
+                if (result is AssignOperatorToken assign1 && assign1.Right.Type == DataType.NULLPTR)
+                {
+                    assign1.Right.Type = assign1.Left.Type;
+                }
+
                 allTokens.RemoveAt(allTokens.Count - 1);
                 if (register) Lexer.initTokens.Add((GlobalVariableToken)variable, (AssignOperatorToken)result);
                 if (add) allTokens.Add(result);
