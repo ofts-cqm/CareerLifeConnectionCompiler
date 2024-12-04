@@ -1,8 +1,9 @@
 ﻿using clcc;
+using System.Text;
 
 namespace CLCC.tokens
 {
-    public class LocalVariableToken : IValueToken
+    public class LocalVariableToken : IExpressionToken, IValueToken
     {
         public int Offset { get; set; }
         public string Name { get; set; }
@@ -46,14 +47,16 @@ namespace CLCC.tokens
             Console.WriteLine($"{indentation}Local {Type} {Name} (offset: {Offset})");
         }
 
-        public override KeyValuePair<string, string> getVariabele(int position)
+        public KeyValuePair<string, string> getVariabele(int position)
         {
             return new KeyValuePair<string, string>($"|imm{position}|mem{position}|sta{position}", Offset + "");
         }
 
-        public override Destination GetDestination()
+        public Destination GetDestination()
         {
             return new Destination() {Type = Destination.STACK, OffSet = Offset };
         }
+
+        public override void writeAss(StringBuilder file, Destination destination) { }
     }
 }

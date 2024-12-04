@@ -32,10 +32,14 @@ namespace CLCC.tokens
         public IExpressionToken Left { get; set; }
         public IExpressionToken Right { get; set; }
 
+        public bool recursive = false;
+
         public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
             if (!Content.Match(Operator)) return false;
+
+            bool IsRecursive = Content.Match("=");
 
             if (Tokens.match(allTokens, false) is not IExpressionToken right)
             {
@@ -54,7 +58,7 @@ namespace CLCC.tokens
                     target = binOp.Right;
                 }
 
-                last.Right = new BinaryOperatorToken(Operator, Precedence, last.Right, right);
+                last.Right = new BinaryOperatorToken(Operator, Precedence, IsRecursive, last.Right, right);
                 result = opToken;
             }
             else
@@ -65,7 +69,7 @@ namespace CLCC.tokens
                     return false;
                 }
 
-                result = new BinaryOperatorToken(Operator, Precedence, left, right);
+                result = new BinaryOperatorToken(Operator, Precedence, IsRecursive, left, right);
                 allTokens.RemoveAt(allTokens.Count - 1);
                 if (add) allTokens.Add(result);
             }
@@ -77,12 +81,13 @@ namespace CLCC.tokens
             return true;
         }
 
-        public BinaryOperatorToken(string @operator, int precedence, IExpressionToken left, IExpressionToken right): base(DataType.NULL)
+        public BinaryOperatorToken(string @operator, int precedence, bool recursive, IExpressionToken left, IExpressionToken right): base(DataType.NULL)
         {
             Operator = @operator;
             Precedence = precedence;
             Left = left;
             Right = right;
+            this.recursive = recursive;
             Type = Tokens.getAdjustedDataType(this);
         }
 
@@ -99,42 +104,20 @@ namespace CLCC.tokens
             Right.print(indentation + "    ");
         }
 
-        public static void decodeDestination(Destination destination, StringBuilder code, out string value, int pos = 3)
-        {
-            switch (destination.Type)
-            {
-                case Destination.REGISTER:
-                    {
-                        value = Destination.RegisterName[destination.OffSet];
-                        break;
-                    }
-                case Destination.STACK:
-                    {
-                        code.Append($"|imm{pos}|mem{pos}|sta{pos}");
-                        value = destination.OffSet.ToString();
-                        break;
-                    }
-                case Destination.HEAP:
-                    {
-                        code.Append($"|imm{pos}|mem{pos}");
-                        value = destination.OffSet.ToString();
-                        break;
-                    }
-                default:
-                    {
-                        value = "";
-                        break;
-                    }
-            }
-        }
+        
 
         public override void writeAss(StringBuilder file, Destination destination)
         {
-            if (destination.Type == Destination.CLOSE)
+            if (destination.Type == Destination.CLOSE && !recursive)
             {
                 Left.writeAss(file, destination);
                 Right.writeAss(file, destination);
                 return;
+            }
+            else if (destination.Type == Destination.CLOSE && recursive && Left is IValueToken LValue)
+            {
+                recursive = false;
+                destination = LValue.GetDestination();
             }
 
             StringBuilder code = new StringBuilder().Append(CodeName);

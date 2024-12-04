@@ -51,6 +51,7 @@ namespace CLCC
 
         public static bool TryParseDataType(out DataType parsedDatatype)
         {
+            Content.Match("struct ");
             if (Content.Match("void "))
             {
                 parsedDatatype = NULL;

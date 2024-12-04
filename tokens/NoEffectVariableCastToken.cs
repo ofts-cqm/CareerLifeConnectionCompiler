@@ -1,6 +1,8 @@
-﻿namespace CLCC.tokens
+﻿using System.Text;
+
+namespace CLCC.tokens
 {
-    public class NoEffectVariableCastToken : IValueToken
+    public class NoEffectVariableCastToken : IExpressionToken, IValueToken
     {
         public IValueToken baseToken;
 
@@ -11,9 +13,9 @@
 
         public NoEffectVariableCastToken() : base(DataType.NULL) { }
 
-        public override Destination GetDestination() => baseToken.GetDestination();
+        public Destination GetDestination() => baseToken.GetDestination();
 
-        public override KeyValuePair<string, string> getVariabele(int position) => baseToken.getVariabele(position);
+        public KeyValuePair<string, string> getVariabele(int position) => baseToken.getVariabele(position);
 
         public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
@@ -56,5 +58,7 @@
             Console.WriteLine($"{indentation}NoEffectCast to {Type.name} Token");
             baseToken.print(indentation + "    ");
         }
+
+        public override void writeAss(StringBuilder file, Destination destination) { }
     }
 }

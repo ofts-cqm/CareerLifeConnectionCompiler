@@ -104,3 +104,17 @@ namespace clcc
         }
     }
 }
+
+/*
+nullptr malloc(int size);
+
+struct pair{
+    int a, b;
+};
+
+void func(){
+    struct pair p = malloc(3);
+    int a = p.a;
+}
+.end
+ */

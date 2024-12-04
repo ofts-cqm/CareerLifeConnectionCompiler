@@ -85,9 +85,10 @@ namespace CLCC
             while (!IsEnd())
             {
                 Fix();
-                currentLine++;
+                AdvanceRow();
             }
             currentLine = 0;
+            currentPosition = 0;
         }
 
         public static bool Analyze()
@@ -132,9 +133,10 @@ namespace CLCC
             while (currentLine < fileContent.Length)
             {
                 Fix();
-                currentLine++;
+                AdvanceRow();
             }
             currentLine = 0;
+            currentPosition = 0;
             return compile;
         }
 

@@ -1,6 +1,5 @@
 ﻿using CLCC.codeblock;
 using System.Text;
-using System.Xml.XPath;
 
 namespace CLCC.tokens
 {
@@ -38,10 +37,10 @@ namespace CLCC.tokens
             new BinaryOperatorToken("-", 3),
             new BinaryOperatorToken(">>", 2),
             new BinaryOperatorToken("<<", 2),
-            new BinaryOperatorToken(">", 0),
-            new BinaryOperatorToken("<", 0),
             new BinaryOperatorToken(">=", 0),
             new BinaryOperatorToken("<=", 0),
+            new BinaryOperatorToken(">", 0),
+            new BinaryOperatorToken("<", 0),
             new BinaryOperatorToken("&&", 0),
             new BinaryOperatorToken("||", 0),
             new BinaryOperatorToken("&", 1),

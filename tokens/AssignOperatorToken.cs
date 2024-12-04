@@ -7,7 +7,7 @@ namespace CLCC.tokens
     {
         public AssignOperatorToken() : base("=", -1) { }
 
-        public AssignOperatorToken(IValueToken variable, IExpressionToken value) : base("=", -1, variable, value) { }
+        public AssignOperatorToken(IValueToken variable, IExpressionToken value) : base("=", -1, false, variable, value) { }
 
         public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
