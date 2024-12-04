@@ -26,8 +26,19 @@ namespace CLCC.tokens
             if (Content.Match("++"))
             {
                 result = new PostfixUnaryOperatorToken((IExpressionToken)lastToken, PLUS);
+                replaceChild(allTokens, parent, (IExpressionToken)result);
                 if (add) allTokens.Add(lastToken);
+                return true;
             }
+            
+            if(Content.Match("--"))
+            {
+                result = new PostfixUnaryOperatorToken((IExpressionToken)lastToken, MINUS);
+                replaceChild(allTokens, parent, (IExpressionToken)result);
+                if (add) allTokens.Add(lastToken);
+                return true;
+            }
+            return false;
         }
 
         public static void replaceChild(List<IToken> allTokens, IExpressionToken? parent, IExpressionToken child)
