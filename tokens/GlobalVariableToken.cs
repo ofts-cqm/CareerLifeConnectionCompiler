@@ -3,7 +3,7 @@ using System.Text;
 
 namespace CLCC.tokens
 {
-    public class GlobalVariableToken : IExpressionToken, IValueToken
+    public class GlobalVariableToken : IValueToken
     {
         public int Offset { get; set; }
         public string Name { get; set; }
@@ -16,12 +16,12 @@ namespace CLCC.tokens
             Initialized = false;
         }
 
-        public Destination GetDestination()
+        public override Destination GetDestination()
         {
             return new Destination() { Type = Destination.HEAP, OffSet = Offset };
         }
 
-        public KeyValuePair<string, string> getVariabele(int position)
+        public override KeyValuePair<string, string> getVariabele(int position)
         {
             return new KeyValuePair<string, string>($"|imm{position}|mem{position}", Offset + "");
         }

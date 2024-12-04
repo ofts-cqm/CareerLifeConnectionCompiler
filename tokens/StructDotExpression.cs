@@ -3,25 +3,28 @@ using System.Text;
 
 namespace CLCC.tokens
 {
-    public class StructDotExpression : IExpressionToken
+    public class StructDotExpression : PostfixUnaryOperatorToken
     {
         public int Offset;
-        public IExpressionToken Left;
+        public const byte StructDot = 2;
 
-        public StructDotExpression(int Offset, IExpressionToken Left, DataType type) : base(type)
+        public StructDotExpression(int Offset, IExpressionToken Left, DataType type) : base(Left, StructDot)
         {
             this.Offset = Offset;
             this.Left = Left;
         }
 
-        public StructDotExpression() : base(DataType.NULL) { }
+        public StructDotExpression() : base(null, StructDot) { }
 
         public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
             result = null;
-            if (allTokens.Count == 0 || allTokens.Last() is not IExpressionToken exp || exp.Type.isPrimitive) return false;
+            IExpressionToken? lastToken = findLast(allTokens, out IExpressionToken? parent);
+            if (lastToken == null) return false;
+            if (!lastToken.Type.isPrimitive) return false;
+
             if (!Content.Match(".")) return false;
-            if(!StructToken.Structs.TryGetValue(exp.Type, out StructToken @struct))
+            if(!StructToken.Structs.TryGetValue(lastToken.Type, out StructToken @struct))
             {
                 Content.LogError("Unknown Struct Type");
                 return false;
@@ -31,12 +34,12 @@ namespace CLCC.tokens
 
             if (offset == -1)
             {
-                Content.LogError($"{name} Not Found in Struct {exp.Type.name}");
+                Content.LogError($"{name} Not Found in Struct {lastToken.Type.name}");
                 return false;
             }
 
-            allTokens.RemoveAt(allTokens.Count - 1);
-            result = new StructDotExpression(offset, exp, @struct.variables[offset].Value);
+            result = new StructDotExpression(offset, lastToken, @struct.variables[offset].Value);
+            replaceChild(allTokens, parent, (IExpressionToken)result);
             if (add) allTokens.Add(result);
             return true;
         }

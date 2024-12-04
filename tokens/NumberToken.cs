@@ -2,7 +2,7 @@
 
 namespace CLCC.tokens
 {
-    internal class NumberToken : IExpressionToken, IValueToken
+    internal class NumberToken : IValueToken
     {
         public int number { get; set; }
         public NumberToken(int number, DataType type):base(type) { this.number = number; }
@@ -69,16 +69,14 @@ namespace CLCC.tokens
             Console.WriteLine($"{indentation}Number Token {number} Type {Type}");
         }
 
-        public KeyValuePair<string, string> getVariabele(int position)
+        public override KeyValuePair<string, string> getVariabele(int position)
         {
             return new KeyValuePair<string, string>("|imm" + position, number + "");
         }
 
-        public Destination GetDestination()
+        public override Destination GetDestination()
         {
             throw new AccessViolationException("Cannot Set Constant");
         }
-
-        public override void writeAss(StringBuilder file, Destination destination) { }
     }
 }

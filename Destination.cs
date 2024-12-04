@@ -1,4 +1,6 @@
-﻿namespace CLCC
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace CLCC
 {
     public struct Destination
     {
@@ -11,5 +13,11 @@
         public const int HEAP = 3;
 
         public static string[] RegisterName = { "eax", "ebx", "ecx", "edx", "edi", "esi" };
+
+        public override bool Equals([NotNullWhen(true)] object? obj)
+        {
+            if (obj is not Destination dest) return false;
+            return OffSet == dest.OffSet && Type == dest.Type;
+        }
     }
 }
