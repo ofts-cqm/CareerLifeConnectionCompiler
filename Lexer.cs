@@ -31,6 +31,7 @@ namespace clcc
             initTokens.Clear();
             Structures.Clear();
             DataType.Init();
+            StructToken.Structs.Clear();
             CurrentOffset = 1024 * 1024;
         }
 
@@ -84,6 +85,7 @@ namespace clcc
                         sb.Append("call|imm1 func_main_noPara null null\n");
                         foreach (IToken token in tokens)
                         {
+                            if (token is AssignOperatorToken) continue;
                             token.writeAss(sb, new() { Type = Destination.CLOSE });
                         }
                         Console.WriteLine(sb.ToString());

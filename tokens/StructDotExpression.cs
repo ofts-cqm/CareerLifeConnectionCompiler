@@ -21,9 +21,9 @@ namespace CLCC.tokens
             result = null;
             IExpressionToken? lastToken = findLast(allTokens, out IExpressionToken? parent);
             if (lastToken == null) return false;
-            if (!lastToken.Type.isPrimitive) return false;
-
             if (!Content.Match(".")) return false;
+            if (lastToken.Type.isPrimitive) return false;
+            
             if(!StructToken.Structs.TryGetValue(lastToken.Type, out StructToken @struct))
             {
                 Content.LogError("Unknown Struct Type");
@@ -39,8 +39,7 @@ namespace CLCC.tokens
             }
 
             result = new StructDotExpression(offset, lastToken, @struct.variables[offset].Value);
-            replaceChild(allTokens, parent, (IExpressionToken)result);
-            if (add) allTokens.Add(result);
+            replaceChild(allTokens, parent, (IExpressionToken)result, add);
             return true;
         }
 
@@ -57,7 +56,7 @@ namespace CLCC.tokens
             if (Left is IValueToken value)
             {
                 file.Append("mov");
-                BinaryOperatorToken.decodeDestination(destination, file, out string off);
+                decodeDestination(destination, file, out string off);
                 var variable = value.getVariabele(1);
                 file.Append(variable.Key).Append(' ')
                     .Append(variable.Value).Append(" null ").Append(off).Append('\n');
@@ -66,12 +65,12 @@ namespace CLCC.tokens
             string registerName = Destination.RegisterName[Tokens.registerUsed];
 
             file.Append("add|imm2");
-            BinaryOperatorToken.decodeDestination(destination, file, out string start, 1);
+            decodeDestination(destination, file, out string start, 1);
             file.Append($" {start} {Offset} {registerName}\n");
 
-            file.Append("mov|heap1");
-            BinaryOperatorToken.decodeDestination(destination, file, out string end);
-            file.Append($"{registerName} null {end}\n");
+            file.Append("mov|mem1");
+            decodeDestination(destination, file, out string end);
+            file.Append($" {registerName} null {end}\n");
         }
     }
 }

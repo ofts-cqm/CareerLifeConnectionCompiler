@@ -21,7 +21,7 @@ namespace CLCC.tokens
             new EndOfStatementToken(),
             new EndOfItemToken(),
             new PostfixUnaryOperatorToken(),
-            //new StructDotExpression(),
+            new StructDotExpression(),
             new ReturnToken(null),
             new IfBlock(),
             new WhileBlock(null),
@@ -52,8 +52,8 @@ namespace CLCC.tokens
             new ExpressionParenthesisToken(),
             new CodeBlock(),
             new NumberToken(),
+            new LocalVariableToken(),
             new NewVariableToken(),
-            new LocalVariableToken()
         };
 
         public static string matchName()
@@ -104,6 +104,8 @@ namespace CLCC.tokens
             {
                 return left;
             }
+
+            if (!right.isPrimitive) return left;
 
             // type inference
             if (left == DataType.NULL) return right;

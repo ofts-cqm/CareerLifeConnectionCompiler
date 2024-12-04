@@ -32,7 +32,6 @@ namespace CLCC.tokens
                         Content.LogWarn("Global Variable Initialized Multiple Times", pos);
                         Lexer.initTokens.Remove(global);
                     }
-                    add = false;
                     global.Initialized = true;
                     register = true;
                 }

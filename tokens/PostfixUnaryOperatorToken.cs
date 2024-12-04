@@ -23,36 +23,32 @@ namespace CLCC.tokens
             IExpressionToken? lastToken = findLast(allTokens, out IExpressionToken? parent);
             if (lastToken == null) return false;
 
-            if (lastToken is not IValueToken)
-            {
-                Content.LogWarn("postfixUnaryOperator is not constant");
-            }
-
             if (Content.Match("++"))
             {
                 result = new PostfixUnaryOperatorToken(lastToken, PLUS);
-                replaceChild(allTokens, parent, (IExpressionToken)result);
-                if (add) allTokens.Add(result);
+                replaceChild(allTokens, parent, (IExpressionToken)result, add);
                 return true;
             }
             
             if(Content.Match("--"))
             {
                 result = new PostfixUnaryOperatorToken(lastToken, MINUS);
-                replaceChild(allTokens, parent, (IExpressionToken)result);
-                if (add) allTokens.Add(result);
+                replaceChild(allTokens, parent, (IExpressionToken)result, add);
                 return true;
             }
             return false;
         }
 
-        public static void replaceChild(List<IToken> allTokens, IExpressionToken? parent, IExpressionToken child)
+        public static void replaceChild(List<IToken> allTokens, IExpressionToken? parent, IExpressionToken child, bool add)
         {
             if (parent is null)
+            {
                 allTokens.RemoveAt(allTokens.Count - 1);
-            else if(parent is BinaryOperatorToken bin)
+                if (add) allTokens.Add(child);
+            }
+            else if (parent is BinaryOperatorToken bin)
                 bin.Right = child;
-            else if(parent is ExpressionParenthesisToken exp)
+            else if (parent is ExpressionParenthesisToken exp)
                 exp.insideTokens[0] = child;
         }
 
@@ -82,7 +78,7 @@ namespace CLCC.tokens
 
         public override void print(string indentation)
         {
-            Console.WriteLine($"{indentation} Postfix Unary Operator {(Operator == PLUS ? "++" : "--")} evaluating {Type}");
+            Console.WriteLine($"{indentation}Postfix Unary Operator {(Operator == PLUS ? "++" : "--")} evaluating {Type}");
         }
 
         public override void writeAss(StringBuilder file, Destination destination)
@@ -103,7 +99,7 @@ namespace CLCC.tokens
             file.Append(Operator == PLUS ? "add|imm2" : "sub|imm2").Append(before.Key).Append(after.Key)
                 .Append(' ').Append(before.Value).Append(" 1 ").AppendLine(after.Value);
 
-            if (destination.Type != Destination.CLOSE && destination.Equals(val.GetDestination()))
+            if (destination.Type != Destination.CLOSE && !destination.Equals(val.GetDestination()))
             {
                 file.Append("mov").Append(before.Key);
                 decodeDestination(destination, file, out string offset);
