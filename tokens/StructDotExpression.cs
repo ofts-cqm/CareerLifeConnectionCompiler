@@ -46,7 +46,8 @@ namespace CLCC.tokens
 
         public override void print(string indentation)
         {
-            Console.WriteLine($"{indentation}{Left.Type.name}.{StructToken.Structs[Left.Type].variables[Offset].Key} (Offset {Offset}): {Type}");
+            Console.WriteLine($"{indentation}{Left.Type.name}.{StructToken.Structs[Left.Type].variables[Offset].Key} (Offset {Offset}): {Type} Obtained from:");
+            Left.print(indentation + "    ");
         }
 
         public override void writeAss(StringBuilder file, Destination destination)
