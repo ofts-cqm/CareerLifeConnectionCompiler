@@ -21,10 +21,14 @@ namespace CLCC.tokens
             if (!Content.Match("return")) return false;
             List<IToken> tokens = new();
             IToken matched = null;
+            Content.Push();
             while (matched is not EndOfStatementToken)
             {
+                Content.Ignore();
+                Content.Push();
                 matched = Tokens.match(tokens, true);
             }
+            Content.Pop();
             if (tokens.Count > 1)
             {
                 Content.LogError("Multiple Return");
