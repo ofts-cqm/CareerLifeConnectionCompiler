@@ -134,14 +134,7 @@ namespace CLCC.tokens
                 else
                 {
                     Left.writeAss(file, destination);
-                    if (destination.Type == Destination.REGISTER)
-                    {
-                        leftValue = Destination.RegisterName[destination.OffSet];
-                    }
-                    else
-                    {
-                        leftValue = destination.OffSet.ToString();
-                    }
+                    decodeDestination(destination, code, out leftValue, 1);
                 }
             }
 

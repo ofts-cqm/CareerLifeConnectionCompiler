@@ -3,7 +3,7 @@ using System.Text;
 
 namespace CLCC.tokens
 {
-    public class StructDotExpression : PostfixUnaryOperatorToken
+    public class StructDotExpression : PostfixUnaryOperatorToken, IAssignable
     {
         public int Offset;
         public const byte StructDot = 2;
@@ -12,6 +12,7 @@ namespace CLCC.tokens
         {
             this.Offset = Offset;
             this.Left = Left;
+            base.Type = type;
         }
 
         public StructDotExpression() : base(null, StructDot) { }
@@ -71,6 +72,48 @@ namespace CLCC.tokens
             file.Append("mov|mem1");
             decodeDestination(destination, file, out string end);
             file.Append($" {registerName} null {end}\n");
+        }
+
+        public Destination GetDestination()
+        {
+            return new() { Type = Destination.REGISTER, OffSet = Tokens.registerUsed - 1, source = this };
+        }
+
+        public void DumpValue()
+        {
+            Tokens.registerUsed--;
+        }
+
+        public bool ProxyDecodeDestination(Destination destination, StringBuilder file, out string value, int pos = 3)
+        {
+            if (destination.Type != Destination.REGISTER)
+            {
+                Console.Error.WriteLine("Internal Error: Destination not supported");
+            }
+
+            file.Append($"|mem{pos}");
+            value = Destination.RegisterName[destination.OffSet];
+            return true;
+        }
+
+        public void PrepareValue(StringBuilder file)
+        {
+            string registerName = Destination.RegisterName[Tokens.registerUsed];
+            Destination destination = new() {Type = Destination.REGISTER, OffSet = Tokens.registerUsed };
+
+            Left.writeAss(file, new Destination() { OffSet = Tokens.registerUsed++, Type = Destination.REGISTER });
+            if (Left is IValueToken value)
+            {
+                file.Append("mov");
+                decodeDestination(destination, file, out string off);
+                var variable = value.getVariabele(1);
+                file.Append(variable.Key).Append(' ')
+                    .Append(variable.Value).Append(" null ").Append(off).Append('\n');
+            }
+
+            file.Append("add|imm2");
+            decodeDestination(destination, file, out string start, 1);
+            file.Append($" {start} {Offset} {registerName}\n");
         }
     }
 }

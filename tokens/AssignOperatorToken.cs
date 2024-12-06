@@ -7,7 +7,7 @@ namespace CLCC.tokens
     {
         public AssignOperatorToken() : base("=", -1) { }
 
-        public AssignOperatorToken(IValueToken variable, IExpressionToken value) : base("=", -1, false, (IExpressionToken)variable, value) { }
+        public AssignOperatorToken(IAssignable variable, IExpressionToken value) : base("=", -1, false, (IExpressionToken)variable, value) { }
 
         public override bool match(List<IToken> allTokens, out IToken? result, bool add = true)
         {
@@ -17,14 +17,14 @@ namespace CLCC.tokens
             Pos pos = Content.GetPos();
             bool register = false;
 
-            IValueToken? variable = null;
-            if (allTokens.Last() is LocalVariableToken local)
+            IAssignable? variable = null;
+            if (allTokens.Last() is IAssignable assignable)
             {
-                variable = local;
+                variable = assignable;
             }
-            else if (allTokens.Last() is GlobalVariableToken global)
+            
+            if (variable is GlobalVariableToken global)
             {
-                variable = global;
                 if (Lexer.Current == null)
                 {
                     if (global.Initialized)
@@ -69,7 +69,8 @@ namespace CLCC.tokens
 
         public override void writeAss(StringBuilder file, Destination destination)
         {
-            Destination operationDestination = (Left as IValueToken)?.GetDestination() ?? destination;
+            (Left as IAssignable)?.PrepareValue(file);
+            Destination operationDestination = (Left as IAssignable)?.GetDestination() ?? destination;
             Right.writeAss(file, operationDestination);
 
             if (Right is IValueToken value)
@@ -89,6 +90,8 @@ namespace CLCC.tokens
                 file.Append("mov").Append(code).Append(' ')
                     .Append(value1).Append(" null ").Append(value2).Append('\n');
             }
+
+            (Left as IAssignable)?.DumpValue();
         }
     }
 }

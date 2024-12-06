@@ -108,15 +108,25 @@ namespace clcc
 }
 
 /*
-nullptr malloc(int size);
+struct Vector{
+    int x, y;
+}
 
-struct pair{
-    int a, b;
-};
+void main(){
+    Vector v;
+    v.x = v.y * 5 + 1;
+}
+.end
+ */
 
-void func(){
-    struct pair p = malloc(3);
-    int a = p.a;
+/*
+struct Vector{
+    int x, y;
+}
+
+void main(){
+    Vector v;
+    v.x = 5 * v.y + 1;
 }
 .end
  */
