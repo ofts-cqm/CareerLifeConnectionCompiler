@@ -77,24 +77,12 @@ namespace CLCC.tokens
 
         public Destination GetDestination()
         {
-            return new() { Type = Destination.REGISTER, OffSet = Tokens.registerUsed - 1, source = this };
+            return new() { Type = Destination.DEREFERENCE, OffSet = Tokens.registerUsed - 1};
         }
 
         public void DumpValue()
         {
             Tokens.registerUsed--;
-        }
-
-        public bool ProxyDecodeDestination(Destination destination, StringBuilder file, out string value, int pos = 3)
-        {
-            if (destination.Type != Destination.REGISTER)
-            {
-                Console.Error.WriteLine("Internal Error: Destination not supported");
-            }
-
-            file.Append($"|mem{pos}");
-            value = Destination.RegisterName[destination.OffSet];
-            return true;
         }
 
         public void PrepareValue(StringBuilder file)

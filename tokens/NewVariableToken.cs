@@ -20,7 +20,6 @@ namespace CLCC.tokens
 
         public bool match(DataType type, string name, Pos namePos, List<IToken> allTokens, out IToken? result, bool add = true)
         {
-            result = null;
             IsCreatingNewVar = true;
             CreatingType = type;
 
@@ -52,7 +51,11 @@ namespace CLCC.tokens
             if (!IsCreatingNewVar || CreatingType is null) return false;
             Pos namePos = Content.GetPos();
             Content.Match("struct ");
-            return match(CreatingType, Tokens.matchName(), namePos, allTokens, out result, add);
+            bool isArr = Content.Match("*");
+            if (isArr) CreatingType.isArray = true;
+            bool matched = match(CreatingType, Tokens.matchName(), namePos, allTokens, out result, add);
+            if (isArr) CreatingType.isArray = false;
+            return matched;
         }
 
         public void print(string indentation)

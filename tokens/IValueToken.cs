@@ -14,12 +14,6 @@ namespace CLCC.tokens
 
         public void PrepareValue(StringBuilder file) { }
 
-        public bool ProxyDecodeDestination(Destination destination, StringBuilder file, out string value, int pos = 3)
-        {
-            value = "";
-            return false;
-        }
-
         public override void writeAss(StringBuilder file, Destination destination) { }
     }
 }

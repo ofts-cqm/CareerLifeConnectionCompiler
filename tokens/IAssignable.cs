@@ -11,6 +11,5 @@ namespace CLCC.tokens
         Destination GetDestination();
         void PrepareValue(StringBuilder file);
         void DumpValue();
-        bool ProxyDecodeDestination(Destination destination, StringBuilder file, out string value, int pos = 3);
     }
 }

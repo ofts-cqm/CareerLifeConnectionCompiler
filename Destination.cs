@@ -6,13 +6,13 @@ namespace CLCC
     public struct Destination
     {
         public int OffSet { get; set; } = 0;
-        public IAssignable? source { get; set; } = null;
         public byte Type { get; set; } = CLOSE;
 
         public const int CLOSE = 0;
         public const int REGISTER = 1;
         public const int STACK = 2;
         public const int HEAP = 3;
+        public const int DEREFERENCE = 4;
 
         public static string[] RegisterName = { "eax", "ebx", "ecx", "edx", "edi", "esi" };
 

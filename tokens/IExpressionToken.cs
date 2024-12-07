@@ -19,10 +19,6 @@ namespace CLCC.tokens
 
         public static void decodeDestination(Destination destination, StringBuilder code, out string value, int pos = 3)
         {
-            if (destination.source != null && destination.source.ProxyDecodeDestination(destination, code, out value, pos))
-            {
-                return;
-            }
             switch (destination.Type)
             {
                 case Destination.REGISTER:
@@ -40,6 +36,12 @@ namespace CLCC.tokens
                     {
                         code.Append($"|imm{pos}|mem{pos}");
                         value = destination.OffSet.ToString();
+                        break;
+                    }
+                case Destination.DEREFERENCE:
+                    {
+                        code.Append($"|mem{pos}");
+                        value = Destination.RegisterName[destination.OffSet];
                         break;
                     }
                 default:
