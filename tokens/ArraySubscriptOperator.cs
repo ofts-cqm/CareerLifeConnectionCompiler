@@ -13,6 +13,8 @@ namespace CLCC.tokens
             Left = left;
         }
 
+        public ArraySubscriptOperator() : base(DataType.NULL) { }
+
         public void DumpValue()
         {
             Tokens.registerUsed--;
@@ -110,7 +112,7 @@ namespace CLCC.tokens
                 file.Append("pop null null esi");
             }
 
-            file.Append("add|imm2").Append(postFix);
+            file.Append("add").Append(postFix);
             decodeDestination(destination, file, out string start, 1);
             file.Append($" {start} {calculated} {registerName}\n");
         }
@@ -134,7 +136,7 @@ namespace CLCC.tokens
             InitExpression(file, destination);
             file.Append("mov|mem1");
             decodeDestination(destination, file, out string end);
-            file.Append($" {Destination.RegisterName[Tokens.registerUsed]} null {end}\n");
+            file.Append($" {Destination.RegisterName[--Tokens.registerUsed]} null {end}\n");
         }
     }
 }

@@ -21,7 +21,8 @@ namespace CLCC.tokens
             { "&", "and" },
             { "|", "or" },
             { "^", "xor" },
-            { "==", "equ"}
+            { "==", "equ"},
+            { "!=", "nequ"}
         };
 
         public static Destination SecondDestination = new() { OffSet = 4, Type = Destination.REGISTER };

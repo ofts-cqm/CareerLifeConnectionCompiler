@@ -73,9 +73,9 @@ namespace CLCC.tokens
             }
             else
             {
-                Console.Write(indentation + "Return Expression");
+                Console.Write(indentation + "Return Expression\n");
                 value.print(indentation + "    ");
-                Console.WriteLine("END");
+                Console.WriteLine(indentation + "End Return");
             }
         }
 

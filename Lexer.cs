@@ -108,9 +108,11 @@ namespace clcc
 }
 
 /*
+int* db;
 int fibonachi(int value){
-    if (value == 1 || value == 2) return 1;
-    return fibonachi(value - 1) + fibonachi(value - 2);
+    if (db[value] != 0) return db[value];
+    if (value < 3) return 1;
+    return (db[value] = fibonachi(value - 1) + fibonachi(value - 2));
 }
 .end
  */

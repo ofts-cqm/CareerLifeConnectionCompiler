@@ -63,6 +63,7 @@ namespace CLCC.tokens
             { 
                 token.print(indentation + "    ");
             }
+            Console.WriteLine(indentation + "End Parenthesis");
         }
 
         public override void writeAss(StringBuilder file, Destination destination)

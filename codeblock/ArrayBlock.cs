@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CLCC.codeblock
 {
-    internal class ArrayBlock
+    public class ArrayBlock
     {
     }
 }
