@@ -23,6 +23,7 @@ namespace CLCC.tokens
             new PostfixUnaryOperatorToken(),
             new StructDotExpression(),
             new ArraySubscriptOperator(),
+            new ConstantValueToken(),
             new ReturnToken(null),
             new IfBlock(),
             new WhileBlock(null),

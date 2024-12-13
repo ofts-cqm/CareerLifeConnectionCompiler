@@ -13,6 +13,7 @@ namespace clcc
         public static Dictionary<string, FunctionBlock> Functions = new();
         public static HashSet<string> Structures = new();
         public static HashSet<string> RawFunctions = new();
+        public static HashSet<ConstantValueToken> SegmentData = new();
         public static Stack<IBlockToken> Context = new();
         public static Dictionary<string, GlobalVariableToken> GlobalVariables = new();
         public static IBlockToken? Current => Context.Count > 0 ? Context.Peek() : null;
@@ -30,6 +31,8 @@ namespace clcc
             RawFunctions.Clear();
             initTokens.Clear();
             Structures.Clear();
+            SegmentData.Clear();
+            ConstantValueToken.names.Clear();
             DataType.Init();
             StructToken.Structs.Clear();
             CurrentOffset = 1024 * 1024;
@@ -77,12 +80,21 @@ namespace clcc
                     Lex(!compile);
                     if (compile)
                     {
-                        StringBuilder sb = new StringBuilder("label segment_code\n");
+                        StringBuilder sb = new("label segment_init\n");
                         foreach (AssignOperatorToken token in initTokens.Values)
                         {
                             token.writeAss(sb, new() { Type = Destination.CLOSE });
                         }
                         sb.Append("call|imm1 func_main_noPara null null\n");
+
+                        if (SegmentData.Count > 0)
+                        {
+                            sb.AppendLine("label segment_data");
+                            foreach (ConstantValueToken constant in SegmentData)
+                                constant.writeData(sb);
+                        }
+
+                        sb.AppendLine("label segment_code");
                         foreach (IToken token in tokens)
                         {
                             if (token is AssignOperatorToken) continue;

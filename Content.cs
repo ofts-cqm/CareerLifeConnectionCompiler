@@ -122,6 +122,11 @@ namespace CLCC
                     read.Clear();
                     continue;
                 }
+                else if (readValue == ".pureClear")
+                {
+                    Console.Clear();
+                    continue;
+                }
                 else if (readValue == ".compile")
                 {
                     compile = true;
