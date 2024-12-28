@@ -24,6 +24,7 @@ namespace CLCC.tokens
             new StructDotExpression(),
             new ArraySubscriptOperator(),
             new ConstantValueToken(),
+            new GlobalVolatileArray(),
             new ReturnToken(null),
             new IfBlock(),
             new WhileBlock(null),

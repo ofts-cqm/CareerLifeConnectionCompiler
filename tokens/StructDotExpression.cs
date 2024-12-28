@@ -80,7 +80,7 @@ namespace CLCC.tokens
             return new() { Type = Destination.DEREFERENCE, OffSet = Tokens.registerUsed - 1};
         }
 
-        public void DumpValue()
+        public void DumpValue(StringBuilder file)
         {
             Tokens.registerUsed--;
         }

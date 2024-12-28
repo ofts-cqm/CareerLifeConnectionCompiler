@@ -95,10 +95,14 @@ namespace CLCC.tokens
                 return;
             }
 
-            KeyValuePair<string, string> before = val.getVariabele(1), after = val.getVariabele(3);
-            file.Append(Operator == PLUS ? "add|imm2" : "sub|imm2").Append(before.Key).Append(after.Key)
-                .Append(' ').Append(before.Value).Append(" 1 ").AppendLine(after.Value);
+            KeyValuePair<string, string> before = val.getVariabele(1);
+            val.PrepareValue(file);
+            Destination dest = val.GetDestination();
+            file.Append(Operator == PLUS ? "add|imm2" : "sub|imm2").Append(before.Key);
+            decodeDestination(dest, file, out string str);
+            file.Append(' ').Append(before.Value).Append(" 1 ").AppendLine(str);
 
+            val.DumpValue(file);
             if (destination.Type != Destination.CLOSE && !destination.Equals(val.GetDestination()))
             {
                 file.Append("mov").Append(before.Key);

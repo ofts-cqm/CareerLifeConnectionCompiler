@@ -151,8 +151,11 @@ namespace CLCC
             {
                 if (currentLine >= fileContent.Length) break;
 
+                Match("unsigned");
+
                 if (CurrentChar == ' ' || CurrentChar == '\n' || CurrentChar == '\r' || CurrentChar == '\t') Advance();
                 else if (Get(2) == "//") AdvanceRow();
+                else if (Get(1) == "#") AdvanceRow();
                 else if (Get(2) == "/*")
                 {
                     Advance();

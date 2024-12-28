@@ -6,13 +6,13 @@ namespace CLCC.tokens
     {
         protected IValueToken(DataType type) : base(type) { }
 
-        public void DumpValue() { }
+        public virtual void DumpValue(StringBuilder file) { }
 
         public abstract Destination GetDestination();
 
         public abstract KeyValuePair<string, string> getVariabele(int position);
 
-        public void PrepareValue(StringBuilder file) { }
+        public virtual void PrepareValue(StringBuilder file) { }
 
         public override void writeAss(StringBuilder file, Destination destination) { }
     }

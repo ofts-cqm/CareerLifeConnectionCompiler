@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 
 namespace CLCC.tokens
 {
@@ -26,7 +27,11 @@ namespace CLCC.tokens
             if (Content.CurrentChar < '0' || Content.CurrentChar > '9') return false;
 
             int num = 0;
-            while (!Content.IsEnd() && Content.CurrentChar >= '0' && Content.CurrentChar <= '9')
+            if (Content.Get(2) == "0x")
+            {
+                num = int.Parse(Content.Get(10), NumberStyles.HexNumber);
+            }
+            else while (!Content.IsEnd() && Content.CurrentChar >= '0' && Content.CurrentChar <= '9')
             {
                 num *= 10;
                 num += Content.CurrentChar - '0';

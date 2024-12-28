@@ -91,7 +91,7 @@ namespace CLCC.tokens
                     .Append(value1).Append(" null ").Append(value2).Append('\n');
             }
 
-            (Left as IAssignable)?.DumpValue();
+            (Left as IAssignable)?.DumpValue(file);
         }
     }
 }

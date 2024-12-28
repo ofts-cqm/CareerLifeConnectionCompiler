@@ -33,7 +33,8 @@ namespace CLCC.tokens
             }
             else
             {
-                Variable = new GlobalVariableToken(type, name, --Lexer.CurrentOffset);
+                Variable = new GlobalVariableToken(type, name, Lexer.CurrentOffset);
+                Lexer.CurrentOffset -= type.Length();
                 if (!Lexer.GlobalVariables.TryAdd(name, (GlobalVariableToken)Variable))
                 {
                     Content.LogWarn("Repetitive Variable Declaration", namePos);

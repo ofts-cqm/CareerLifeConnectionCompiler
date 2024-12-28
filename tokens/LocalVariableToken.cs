@@ -8,6 +8,8 @@ namespace CLCC.tokens
         public int Offset { get; set; }
         public string Name { get; set; }
 
+        public int tempReg;
+
         public LocalVariableToken(int offset, string name, DataType type) : base(type)
         {
             Offset = offset;
@@ -52,9 +54,21 @@ namespace CLCC.tokens
             return new KeyValuePair<string, string>($"|imm{position}|mem{position}|sta{position}", Offset + "");
         }
 
+        public override void PrepareValue(StringBuilder file)
+        {
+            tempReg = Tokens.registerUsed++;
+        }
+
+
         public override Destination GetDestination()
         {
-            return new Destination() {Type = Destination.STACK, OffSet = Offset };
+            return new Destination() {Type = Destination.REGISTER, OffSet = tempReg };
+        }
+
+        public override void DumpValue(StringBuilder file)
+        {
+            file.AppendLine($"mov|imm3|mem3|sta3 {Destination.RegisterName[tempReg]} null {Offset}");
+            Tokens.registerUsed--;
         }
     }
 }

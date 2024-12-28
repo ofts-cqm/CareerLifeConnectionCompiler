@@ -40,14 +40,14 @@ namespace CLCC.codeblock
                 {
                     if (!(jump_if_true ^ default_true))
                     {
-                        file.Append($"jmp|imm3 null null {label}\n");
+                        file.Append($"jmp|imm1 {label} null null\n");
                     }
                     return;
                 }
                 Condition.writeAss(file, new Destination() { OffSet = 0, Type = Destination.REGISTER });
             }
             if (!jump_if_true) file.Append("n|");
-            file.Append($"je|imm3{postfix} {dest} null {label}\n");
+            file.Append($"je|imm1{postfix} {label }{dest} null\n");
         }
     }
 }

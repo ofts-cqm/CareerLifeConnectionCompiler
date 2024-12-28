@@ -1,4 +1,5 @@
-﻿using CLCC.codeblock;
+﻿using clcc;
+using CLCC.codeblock;
 using System.Text;
 
 namespace CLCC.tokens
@@ -59,16 +60,22 @@ namespace CLCC.tokens
             int offset = currentContext != null ? currentContext.LocalCount + currentContext.SubVariableCount + 2 : 2;
             for (int i = 0; i < insideTokens.Count; i++)
             {
-                insideTokens[i].writeAss(file, new Destination() 
-                { 
-                    Type = Destination.STACK, 
-                    OffSet = offset + i
-                });
                 if (insideTokens[i] is IValueToken value)
                 {
                     var variable = value.getVariabele(1);
                     file.Append("mov|imm3|mem3|sta3").Append(variable.Key).Append(' ')
                         .Append(variable.Value).Append(" null ").Append(offset + i).Append('\n');
+                }
+                else
+                {
+                    insideTokens[i].writeAss(file, new Destination()
+                    {
+                        Type = Destination.REGISTER,
+                        OffSet = ++Tokens.registerUsed
+                    });
+                    Tokens.registerUsed--;
+                    file.Append("mov|imm3|mem3|sta3").Append(' ').Append(Destination.RegisterName[Tokens.registerUsed])
+                        .Append(" null ").Append(offset + i).Append('\n');
                 }
             }
         }

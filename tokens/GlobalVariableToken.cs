@@ -9,6 +9,8 @@ namespace CLCC.tokens
         public string Name { get; set; }
         public bool Initialized { get; set; }
 
+        public int tempReg;
+
         public GlobalVariableToken(DataType type, string name, int offset) : base(type)
         {
             Name = name;
@@ -16,9 +18,20 @@ namespace CLCC.tokens
             Initialized = false;
         }
 
+        public override void PrepareValue(StringBuilder file)
+        {
+            tempReg = Tokens.registerUsed++;
+        }
+
         public override Destination GetDestination()
         {
-            return new Destination() { Type = Destination.HEAP, OffSet = Offset };
+            return new Destination() { Type = Destination.REGISTER, OffSet = tempReg };
+        }
+
+        public override void DumpValue(StringBuilder file)
+        {
+            file.AppendLine($"mov|imm3|mem3 {Destination.RegisterName[tempReg]} null {Offset}");
+            Tokens.registerUsed--;
         }
 
         public override KeyValuePair<string, string> getVariabele(int position)

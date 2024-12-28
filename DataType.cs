@@ -15,6 +15,7 @@ namespace CLCC
         public bool isPrimitive { get; set; }
         public bool isArray { get; set; }
         public string name { get; set; }
+        public int? length { get; set; }
 
         public static void Init()
         {
@@ -34,6 +35,12 @@ namespace CLCC
             this.isPrimitive = copyFrom.isPrimitive;
             this.name = copyFrom.name;
             this.isArray = copyFrom.isArray;
+        }
+
+        public int Length()
+        {
+            if (isPrimitive) return 1;
+            return length ?? 1;
         }
 
         public static bool operator==(DataType left, DataType right)

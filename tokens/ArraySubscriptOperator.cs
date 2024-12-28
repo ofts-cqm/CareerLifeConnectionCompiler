@@ -15,7 +15,7 @@ namespace CLCC.tokens
 
         public ArraySubscriptOperator() : base(DataType.NULL) { }
 
-        public void DumpValue()
+        public void DumpValue(StringBuilder file)
         {
             Tokens.registerUsed--;
         }

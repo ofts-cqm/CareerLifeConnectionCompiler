@@ -10,6 +10,6 @@ namespace CLCC.tokens
     {
         Destination GetDestination();
         void PrepareValue(StringBuilder file);
-        void DumpValue();
+        void DumpValue(StringBuilder file);
     }
 }
